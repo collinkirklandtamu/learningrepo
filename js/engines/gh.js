@@ -142,7 +142,8 @@
       return 0;
     }
     if (op === 'view') {
-      const rem = originRemote(m, repo, io);
+      const argRepo = a.find((x) => !x.startsWith('-'));
+      const rem = argRepo ? m.remotes['github.com/' + argRepo.toLowerCase()] || (io.err(`GraphQL: Could not resolve to a Repository with the name '${argRepo}'.`), null) : originRemote(m, repo, io);
       if (!rem) return 1;
       io.out(`${rem.owner}/${rem.name}\n${rem.forkOf ? 'Fork of ' + rem.forkOf.replace('github.com/', '') + '\n' : ''}\nView this repository on GitHub: ${rem.url}`);
       return 0;
@@ -154,12 +155,29 @@
   function currentPr(rem, repo) {
     return rem.prs.find((x) => x.head === repo.head.ref && x.state === 'OPEN');
   }
+  // a fork's PRs live on the upstream repo (like real gh, which targets the parent by default)
+  function upstreamOf(m, rem) { return rem.forkOf ? m.remotes[rem.forkOf] || null : null; }
 
   function ghPr(m, op, a, io, repo) {
     const rem = originRemote(m, repo, io);
     if (!rem) return 1;
     const vf = ['--title', '-t', '--body', '-b', '--base', '-B', '--head', '-H', '--state', '-s'];
     const p = positional(a, vf);
+    const up = upstreamOf(m, rem);
+    if (op === 'create' && up) {
+      const head = flag(a, '--head', '-H') || repo.head.ref;
+      const base = flag(a, '--base', '-B') || up.defaultBranch;
+      const pushed = rem.branches[head];
+      if (!pushed) { io.err('aborted: you must first push the current branch to a remote, or use the --head flag'); return 1; }
+      const title = flag(a, '--title', '-t');
+      const body = flag(a, '--body', '-b');
+      if (typeof title !== 'string') { io.err('must provide `--title` and `--body` (or `--fill`) when not running interactively'); return 1; }
+      if (G.isAncestor(m, pushed, up.branches[base])) { io.err(`pull request create failed: GraphQL: No commits between ${base} and ${head} (createPullRequest)`); return 1; }
+      const pr = { number: up.num++, title, body: typeof body === 'string' ? body : '', head, base, state: 'OPEN', author: m.ghUser, reviews: [], comments: [], headRepo: rem.key };
+      up.prs.push(pr);
+      io.out(`\nCreating pull request for ${rem.owner}:${head} into ${base} in ${up.owner}/${up.name}\n\n${up.url}/pull/${pr.number}`);
+      return 0;
+    }
     if (op === 'create') {
       const head = flag(a, '--head', '-H') || repo.head.ref;
       const base = flag(a, '--base', '-B') || rem.defaultBranch;
@@ -188,8 +206,8 @@
       return 0;
     }
     const find = () => {
-      if (p[0]) return rem.prs.find((x) => String(x.number) === p[0].replace('#', '') || x.head === p[0]);
-      return currentPr(rem, repo);
+      if (p[0]) return rem.prs.find((x) => String(x.number) === p[0].replace('#', '') || x.head === p[0]) || (up && up.prs.find((x) => String(x.number) === p[0].replace('#', '')));
+      return currentPr(rem, repo) || (up && up.prs.find((x) => x.headRepo === rem.key && x.head === repo.head.ref && x.state === 'OPEN'));
     };
     if (op === 'view') {
       const pr = find();

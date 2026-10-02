@@ -14,7 +14,7 @@
     drills.forEach((d, i) => {
       const base = {
         id: `${parent.id}-d${i + 1}`, drill: true, parent: parent.id, skill: parent.skill, diff: parent.diff,
-        xp: Math.max(6, Math.round((parent.xp || 20) * 0.4)),
+        xp: Math.min(20, Math.max(6, Math.round((parent.xp || 20) * 0.4))),
         read: 'Same idea, new twist. There is no new reading: apply what the lesson taught.',
         recall: [],
       };
