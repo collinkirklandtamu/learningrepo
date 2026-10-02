@@ -195,27 +195,37 @@ test('every lesson has the fields the UI relies on, and drills/capstones are wel
   }
 });
 
-test('content-quality gate: plenty of practice in every course', () => {
+test('content-quality gate: each course is a focused 1-2 week path', () => {
+  let total = 0;
   for (const c of LP.courses) {
     const mains = c.lessons.filter((l) => !l.drill && !l.capstone);
-    assert.ok(mains.length >= 14, `${c.id}: needs at least 14 main lessons (has ${mains.length})`);
+    assert.ok(mains.length >= 10 && mains.length <= 17, `${c.id}: a course is 10-17 core lessons (has ${mains.length})`);
     assert.strictEqual(c.lessons.filter((l) => l.capstone).length, 1, `${c.id}: exactly one capstone`);
     for (const l of mains) {
       const drills = c.lessons.filter((x) => x.parent === l.id).length;
-      assert.ok(drills >= 2, `${l.id}: needs 2+ drills (has ${drills})`);
-      assert.ok((l.recall || []).length >= 4, `${l.id}: needs 4+ recall cards (has ${(l.recall || []).length})`);
+      assert.strictEqual(drills, 1, `${l.id}: exactly one optional practice drill (has ${drills})`);
+      assert.strictEqual((l.recall || []).length, 3, `${l.id}: exactly 3 recall cards (has ${(l.recall || []).length})`);
     }
     const cap = c.lessons.find((l) => l.capstone);
-    assert.ok((cap.recall || []).length >= 4, `${c.id}: capstone recall`);
+    assert.ok((cap.recall || []).length === 3, `${c.id}: capstone recall`);
     assert.ok(cap.xp >= 100, `${c.id}: capstone is worth real XP`);
+    assert.ok(/about \d+ days/.test(LP.paceText(c)), `${c.id}: shows a pace hint`);
+    assert.ok(parseInt(/about (\d+) days/.exec(LP.paceText(c))[1], 10) <= 14, `${c.id}: finishable in two weeks at an hour a day: ${LP.paceText(c)}`);
+    total += c.lessons.filter((l) => !l.drill).length;
   }
-  const total = LP.courses.reduce((n, c) => n + c.lessons.length, 0);
-  assert.ok(total >= 400, 'the platform should have 400+ exercises (lessons + drills + capstones), has ' + total);
+  assert.ok(total >= 60 && total <= 80, 'the platform should be about 70 lessons in total, has ' + total);
+});
+test('practice drills never block progress', () => {
+  const py = LP.course('python');
+  const store = LP.createStore({ getItem: () => null, setItem: () => {} });
+  assert.strictEqual(LP.nextInCourse(store, py).id, 'py-hello');
+  store.completeLesson(py.lessons[0], py, { fails: 0, hints: 0 });
+  assert.strictEqual(LP.nextInCourse(store, py).id, 'py-variables', 'after a lesson comes the next LESSON, not its drill');
 });
 
 test('both OOP arcs exist and include inheritance lessons', () => {
   const arcs = {};
   for (const c of LP.courses) for (const l of c.lessons) if (l.arc) (arcs[l.arc] = arcs[l.arc] || []).push(l.id);
   assert.ok(arcs['oop-python'].includes('py-inheritance'), 'python arc has inheritance');
-  assert.ok(arcs['oop-r'].includes('r-s3') && arcs['oop-r'].includes('r-s4') && arcs['oop-r'].includes('r-r5'), 'R arc covers S3, S4 and Reference classes');
+  assert.ok(arcs['oop-r'].includes('r-s3') && arcs['oop-r'].includes('r-s4'), 'R arc covers S3 and S4 inheritance');
 });

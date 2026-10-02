@@ -91,7 +91,7 @@ const ok = (cond, msg) => { if (cond) console.log('  ✓ ' + msg); else { failur
   ok((await xp(page)) === earned + 5, 'correct recall answer adds +5 XP bonus');
   await page.click('.after a.btn.primary');
   await page.waitForSelector('.lesson-title');
-  ok(/py-hello-d1/.test(page.url()), 'Next goes to the first practice drill of the lesson');
+  ok(/py-variables/.test(page.url()), 'Next goes to the next lesson (practice drills are optional): ' + page.url());
   ok((await page.evaluate(() => LP.store.dueCards().length)) === 0, 'planted cards are not due immediately');
 
   // runtime error surfaces nicely, infinite loop is stopped
@@ -256,8 +256,8 @@ const ok = (cond, msg) => { if (cond) console.log('  ✓ ' + msg); else { failur
   await page.goto(base + '#/course/python');
   await page.waitForSelector('.node');
   const pyMains = LP.courses.find((c) => c.id === 'python').lessons.filter((l) => !l.drill).length;
-  ok((await page.$$('.node')).length === pyMains && pyMains >= 30, `python course lists ${pyMains} main lessons`);
-  ok((await page.$$('.dchip')).length >= 2, 'practice drills are shown under their lessons');
+  ok((await page.$$('.node')).length === pyMains && pyMains >= 14 && pyMains <= 18, `python course lists ${pyMains} main lessons`);
+  ok((await page.$$('.dchip')).length >= 1, 'optional practice drills are shown under their lessons');
   ok((await page.$$('.node.done')).length >= 1, 'completed lessons are marked');
   await page.screenshot({ path: path.join(SHOTS, '06-course.png') });
   await page.goto(base + '#/profile');

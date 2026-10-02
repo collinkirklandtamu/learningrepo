@@ -178,7 +178,8 @@
         <div class="row" style="justify-content:flex-end;margin-top:16px">${(lesson.recall || [])[0] ? '<button type="button" class="btn ghost" data-x="skip">Skip</button><button type="button" class="btn primary" data-x="lock" autofocus>Lock it in: 1 quick question →</button>' : `<a class="btn" href="#/course/${course.id}" data-x="close">Course</a>${next ? `<a class="btn primary" href="#/lesson/${next.id}" data-x="close" autofocus>Next: ${esc(next.title)} →</a>` : ''}`}</div>`, { sticky: true });
       const q = (lesson.recall || [])[0];
       const finish = () => {
-        const nav = next ? `<a class="btn primary" href="#/lesson/${next.id}" data-x="close">Next: ${esc(next.title)} →</a>` : `<a class="btn primary" href="#/course/${course.id}" data-x="close">Back to course</a>`;
+        const drill = !lesson.drill && LP.drillsOf(course, lesson.id).find((x) => !LP.store.isDone(x.id));
+        const nav = (drill ? `<a class="btn ghost" href="#/lesson/${drill.id}" data-x="close">Optional practice</a>` : '') + (next ? `<a class="btn primary" href="#/lesson/${next.id}" data-x="close">Next: ${esc(next.title)} →</a>` : `<a class="btn primary" href="#/course/${course.id}" data-x="close">Back to course</a>`);
         m.el.querySelector('.after') && (m.el.querySelector('.after').innerHTML = `<div class="row" style="justify-content:flex-end;margin-top:16px"><a class="btn" href="#/review" data-x="close">Review deck</a>${nav}</div>`);
       };
       m.el.addEventListener('click', (e) => {

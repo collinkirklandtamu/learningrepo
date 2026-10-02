@@ -8,7 +8,13 @@
   LP.findLesson = (id) => {
     for (const c of LP.courses) {
       const i = c.lessons.findIndex((l) => l.id === id);
-      if (i >= 0) return { course: c, lesson: c.lessons[i], index: i, next: c.lessons[i + 1] || null, prev: c.lessons[i - 1] || null };
+      if (i >= 0) {
+        // prev/next walk the main lessons only: drills are optional side exercises of their parent
+        const mains = c.lessons.filter((l) => !l.drill);
+        const parentId = c.lessons[i].drill ? c.lessons[i].parent : c.lessons[i].id;
+        const mi = mains.findIndex((l) => l.id === parentId);
+        return { course: c, lesson: c.lessons[i], index: i, next: mains[mi + 1] || null, prev: c.lessons[i].drill ? mains[mi] : mains[mi - 1] || null };
+      }
     }
     return null;
   };
@@ -24,11 +30,16 @@
   LP.drillsOf = (course, lessonId) => course.lessons.filter((l) => l.drill && l.parent === lessonId);
   // next lesson to suggest: continue the most recently touched course, else the first unfinished one
   // the next thing to do inside one course (drills right after the last finished lesson first, then the next lesson)
+  // practice drills are optional: they never block progress, so "next" always means the next lesson
+  LP.paceText = (c) => {
+    const mains = c.lessons.filter((l) => !l.drill).length;
+    const hours = c.lessons.filter((l) => !l.drill).reduce((a, l) => a + (l.capstone ? 2 : l.diff >= 3 ? 0.9 : l.diff === 2 ? 0.7 : 0.5), 0);
+    return `${mains} lessons · about ${Math.max(1, Math.ceil(hours))} days at an hour a day`;
+  };
   LP.nextInCourse = (store, c) => {
     const arr = c.lessons;
     let lastMain = -1;
     arr.forEach((l, i) => { if (!l.drill && store.isDone(l.id)) lastMain = i; });
-    for (let i = lastMain + 1; i < arr.length && arr[i].drill; i++) if (!store.isDone(arr[i].id)) return arr[i];
     return arr.find((x, i) => i > lastMain && !x.drill && !store.isDone(x.id)) || arr.find((x) => !x.drill && !store.isDone(x.id)) || null;
   };
   LP.nextLesson = (store) => {

@@ -82,7 +82,7 @@
   "group": "Vectors",
   "ex": "order(c(30, 10, 20))",
   "out": "[1] 2 3 1",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "rank",
@@ -145,7 +145,7 @@
   "group": "Vectors",
   "ex": "ifelse(c(1, 5, 10) > 4, \"big\", \"small\")",
   "out": "[1] \"small\" \"big\"   \"big\"",
-  "lesson": "r-control"
+  "lesson": "r-functions"
  },
  {
   "name": "unique",
@@ -163,7 +163,7 @@
   "group": "Vectors",
   "ex": "duplicated(c(\"a\", \"b\", \"a\"))",
   "out": "[1] FALSE FALSE  TRUE",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "head",
@@ -271,7 +271,7 @@
   "group": "Vectors",
   "ex": "numeric(3)",
   "out": "[1] 0 0 0",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "character",
@@ -406,7 +406,7 @@
   "group": "Vectors",
   "ex": "cummax(c(1, 3, 2, 5, 4))",
   "out": "[1] 1 3 3 5 5",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "cummin",
@@ -415,7 +415,7 @@
   "group": "Vectors",
   "ex": "cummin(c(5, 3, 4, 1))",
   "out": "[1] 5 3 3 1",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "diff",
@@ -433,7 +433,7 @@
   "group": "Vectors",
   "ex": "outer(1:3, 1:3)",
   "out": "     [,1] [,2] [,3]\n[1,]    1    2    3\n[2,]    2    4    6\n[3,]    3    6    9",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "sum",
@@ -712,7 +712,7 @@
   "group": "Math & summary",
   "ex": "17 %% 5",
   "out": "[1] 2",
-  "lesson": "r-control"
+  "lesson": "r-functions"
  },
  {
   "name": "%/%",
@@ -721,7 +721,7 @@
   "group": "Math & summary",
   "ex": "17 %/% 5",
   "out": "[1] 3",
-  "lesson": "r-control"
+  "lesson": "r-functions"
  },
  {
   "name": "choose",
@@ -730,7 +730,7 @@
   "group": "Math & summary",
   "ex": "choose(5, 2)",
   "out": "[1] 10",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "factorial",
@@ -739,7 +739,7 @@
   "group": "Math & summary",
   "ex": "factorial(5)",
   "out": "[1] 120",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "prod",
@@ -757,7 +757,7 @@
   "group": "Math & summary",
   "ex": "rowSums(matrix(1:6, 2))",
   "out": "[1]  9 12",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "colMeans",
@@ -766,7 +766,7 @@
   "group": "Math & summary",
   "ex": "colMeans(matrix(1:6, 2))",
   "out": "[1] 1.5 3.5 5.5",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "paste",
@@ -1063,7 +1063,7 @@
   "group": "Factors & dates",
   "ex": "factor(c(\"lo\", \"hi\", \"lo\"), levels = c(\"lo\", \"hi\"))",
   "out": "[1] lo hi lo\nLevels: lo hi",
-  "lesson": "r-factors"
+  "lesson": "r-vectors"
  },
  {
   "name": "levels",
@@ -1072,7 +1072,7 @@
   "group": "Factors & dates",
   "ex": "levels(factor(c(\"b\", \"a\", \"b\")))",
   "out": "[1] \"a\" \"b\"",
-  "lesson": "r-factors"
+  "lesson": "r-vectors"
  },
  {
   "name": "nlevels",
@@ -1081,7 +1081,7 @@
   "group": "Factors & dates",
   "ex": "nlevels(factor(c(\"b\", \"a\", \"b\")))",
   "out": "[1] 2",
-  "lesson": "r-factors"
+  "lesson": "r-vectors"
  },
  {
   "name": "droplevels",
@@ -1090,7 +1090,7 @@
   "group": "Factors & dates",
   "ex": "levels(droplevels(factor(c(\"a\", \"b\"))[1]))",
   "out": "[1] \"a\"",
-  "lesson": "r-factors"
+  "lesson": "r-vectors"
  },
  {
   "name": "cut",
@@ -1099,7 +1099,7 @@
   "group": "Factors & dates",
   "ex": "cut(c(1, 5, 10), breaks = c(0, 3, 7, 12), labels = c(\"low\", \"mid\", \"high\"))",
   "out": "[1] low  mid  high\nLevels: low mid high",
-  "lesson": "r-factors"
+  "lesson": "r-vectors"
  },
  {
   "name": "relevel",
@@ -1108,7 +1108,7 @@
   "group": "Factors & dates",
   "ex": "levels(relevel(factor(c(\"a\", \"b\", \"c\")), ref = \"c\"))",
   "out": "[1] \"c\" \"a\" \"b\"",
-  "lesson": "r-factors"
+  "lesson": "r-vectors"
  },
  {
   "name": "as.Date",
@@ -1117,7 +1117,7 @@
   "group": "Factors & dates",
   "ex": "as.Date(\"2024-03-09\") + 30",
   "out": "[1] \"2024-04-08\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "format.Date",
@@ -1126,7 +1126,7 @@
   "group": "Factors & dates",
   "ex": "format(as.Date(\"2024-03-09\"), \"%d %B %Y\")",
   "out": "[1] \"09 March 2024\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "difftime",
@@ -1135,7 +1135,7 @@
   "group": "Factors & dates",
   "ex": "difftime(as.Date(\"2024-03-09\"), as.Date(\"2024-03-01\"), units = \"days\")",
   "out": "Time difference of 8 days",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "seq.Date",
@@ -1144,7 +1144,7 @@
   "group": "Factors & dates",
   "ex": "seq(as.Date(\"2024-01-31\"), by = \"month\", length.out = 3)",
   "out": "[1] \"2024-01-31\" \"2024-03-02\" \"2024-03-31\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "weekdays",
@@ -1153,7 +1153,7 @@
   "group": "Factors & dates",
   "ex": "weekdays(as.Date(\"2024-03-09\"))",
   "out": "[1] \"Saturday\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "months",
@@ -1162,7 +1162,7 @@
   "group": "Factors & dates",
   "ex": "months(as.Date(\"2024-03-09\"))",
   "out": "[1] \"March\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "ISOdate",
@@ -1171,7 +1171,7 @@
   "group": "Factors & dates",
   "ex": "format(ISOdate(2024, 3, 9), \"%Y-%m-%d\")",
   "out": "[1] \"2024-03-09\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "as.POSIXct",
@@ -1180,7 +1180,7 @@
   "group": "Factors & dates",
   "ex": "format(as.POSIXct(\"2024-03-09 13:45:00\", tz = \"UTC\"), \"%H:%M\")",
   "out": "[1] \"13:45\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "strftime",
@@ -1189,7 +1189,7 @@
   "group": "Factors & dates",
   "ex": "strftime(as.Date(\"2024-03-09\"), \"%A\")",
   "out": "[1] \"Saturday\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "list",
@@ -1198,7 +1198,7 @@
   "group": "Lists, apply & functional",
   "ex": "str(list(a = 1, b = \"x\"))",
   "out": "List of 2\n $ a: num 1\n $ b: chr \"x\"",
-  "lesson": "r-lists"
+  "lesson": "r-vectors"
  },
  {
   "name": "unlist",
@@ -1207,7 +1207,7 @@
   "group": "Lists, apply & functional",
   "ex": "unlist(list(a = 1, b = list(c = 2, d = 3)))",
   "out": "  a b.c b.d \n  1   2   3",
-  "lesson": "r-lists"
+  "lesson": "r-vectors"
  },
  {
   "name": "lapply",
@@ -1234,7 +1234,7 @@
   "group": "Lists, apply & functional",
   "ex": "vapply(c(\"a\", \"bb\"), nchar, integer(1))",
   "out": " a bb \n 1  2",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "mapply",
@@ -1243,7 +1243,7 @@
   "group": "Lists, apply & functional",
   "ex": "mapply(function(a, b) a + b, 1:3, 4:6)",
   "out": "[1] 5 7 9",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "Map",
@@ -1252,7 +1252,7 @@
   "group": "Lists, apply & functional",
   "ex": "str(Map(function(a, b) a * b, 1:2, 3:4))",
   "out": "List of 2\n $ : int 3\n $ : int 8",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "Filter",
@@ -1261,7 +1261,7 @@
   "group": "Lists, apply & functional",
   "ex": "Filter(function(n) n %% 2 == 0, 1:10)",
   "out": "[1]  2  4  6  8 10",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "Reduce",
@@ -1270,7 +1270,7 @@
   "group": "Lists, apply & functional",
   "ex": "Reduce(`+`, 1:5, accumulate = TRUE)",
   "out": "[1]  1  3  6 10 15",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "Position",
@@ -1279,7 +1279,7 @@
   "group": "Lists, apply & functional",
   "ex": "Position(function(n) n > 3, c(1, 5, 2, 8))",
   "out": "[1] 2",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "Find",
@@ -1288,7 +1288,7 @@
   "group": "Lists, apply & functional",
   "ex": "Find(function(n) n > 3, c(1, 5, 2, 8))",
   "out": "[1] 5",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "do.call",
@@ -1297,7 +1297,7 @@
   "group": "Lists, apply & functional",
   "ex": "do.call(rbind, list(1:2, 3:4))",
   "out": "     [,1] [,2]\n[1,]    1    2\n[2,]    3    4",
-  "lesson": "r-functions-adv"
+  "lesson": "r-functions"
  },
  {
   "name": "Recall",
@@ -1306,7 +1306,7 @@
   "group": "Lists, apply & functional",
   "ex": "(function(n) if (n <= 1) 1 else n * Recall(n - 1))(5)",
   "out": "[1] 120",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "Vectorize",
@@ -1315,7 +1315,7 @@
   "group": "Lists, apply & functional",
   "ex": "f <- Vectorize(function(a, b) if (a > b) a else b)\nf(1:3, c(2, 2, 2))",
   "out": "[1] 2 2 3",
-  "lesson": "r-functions-adv"
+  "lesson": "r-functions"
  },
  {
   "name": "tapply",
@@ -1333,7 +1333,7 @@
   "group": "Lists, apply & functional",
   "ex": "apply(matrix(1:6, 2), 1, sum)",
   "out": "[1]  9 12",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "split",
@@ -1351,7 +1351,7 @@
   "group": "Lists, apply & functional",
   "ex": "unlist(rapply(list(1, list(2, 3)), function(x) x * 10, how = \"list\"))",
   "out": "[1] 10 20 30",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "setNames",
@@ -1360,7 +1360,7 @@
   "group": "Lists, apply & functional",
   "ex": "setNames(1:3, c(\"a\", \"b\", \"c\"))",
   "out": "a b c \n1 2 3",
-  "lesson": "r-lists"
+  "lesson": "r-vectors"
  },
  {
   "name": "stack",
@@ -1369,7 +1369,7 @@
   "group": "Lists, apply & functional",
   "ex": "stack(list(a = 1:2, b = 3))",
   "out": "  values ind\n1      1   a\n2      2   a\n3      3   b",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "array",
@@ -1378,7 +1378,7 @@
   "group": "Lists, apply & functional",
   "ex": "dim(array(1:24, c(2, 3, 4)))",
   "out": "[1] 2 3 4",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "lengths",
@@ -1387,7 +1387,7 @@
   "group": "Lists, apply & functional",
   "ex": "lengths(list(1:3, \"a\", NULL))",
   "out": "[1] 3 1 0",
-  "lesson": "r-lists"
+  "lesson": "r-vectors"
  },
  {
   "name": "if / else",
@@ -1396,7 +1396,7 @@
   "group": "Control flow & functions",
   "ex": "x <- 5\nif (x > 3) \"big\" else \"small\"",
   "out": "[1] \"big\"",
-  "lesson": "r-control"
+  "lesson": "r-functions"
  },
  {
   "name": "switch",
@@ -1405,7 +1405,7 @@
   "group": "Control flow & functions",
   "ex": "switch(\"b\", a = \"first\", b = \"second\", \"other\")",
   "out": "[1] \"second\"",
-  "lesson": "r-control"
+  "lesson": "r-functions"
  },
  {
   "name": "for",
@@ -1432,7 +1432,7 @@
   "group": "Control flow & functions",
   "ex": "n <- 0\nrepeat { n <- n + 1; if (n == 4) break }\nn",
   "out": "[1] 4",
-  "lesson": "r-control"
+  "lesson": "r-functions"
  },
  {
   "name": "function",
@@ -1459,7 +1459,7 @@
   "group": "Control flow & functions",
   "ex": "f <- function(a, b) if (missing(b)) \"no b\" else \"b given\"\nf(1)",
   "out": "[1] \"no b\"",
-  "lesson": "r-functions-adv"
+  "lesson": "r-functions"
  },
  {
   "name": "match.arg",
@@ -1468,7 +1468,7 @@
   "group": "Control flow & functions",
   "ex": "f <- function(type = c(\"mean\", \"median\")) match.arg(type)\nf(\"med\")",
   "out": "[1] \"median\"",
-  "lesson": "r-functions-adv"
+  "lesson": "r-functions"
  },
  {
   "name": "on.exit",
@@ -1477,7 +1477,7 @@
   "group": "Control flow & functions",
   "ex": "f <- function() { on.exit(cat(\"bye\\n\")); cat(\"hi\\n\") }\nf()",
   "out": "hi\nbye",
-  "lesson": "r-functions-adv"
+  "lesson": "r-functions"
  },
  {
   "name": "stopifnot",
@@ -1549,7 +1549,7 @@
   "group": "Control flow & functions",
   "ex": "f <- function(...) nargs()\nf(1, 2, 3)",
   "out": "[1] 3",
-  "lesson": "r-functions-adv"
+  "lesson": "r-functions"
  },
  {
   "name": "Sys.time",
@@ -1558,7 +1558,7 @@
   "group": "Control flow & functions",
   "ex": "class(Sys.time())",
   "out": "[1] \"POSIXct\" \"POSIXt\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "system.time",
@@ -1567,7 +1567,7 @@
   "group": "Control flow & functions",
   "ex": "class(system.time(sum(1:10)))",
   "out": "[1] \"proc_time\"",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "quote",
@@ -1576,7 +1576,7 @@
   "group": "Control flow & functions",
   "ex": "e <- quote(x + 1)\neval(e, list(x = 5))",
   "out": "[1] 6",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "substitute",
@@ -1585,7 +1585,7 @@
   "group": "Control flow & functions",
   "ex": "f <- function(x) deparse(substitute(x))\nf(a + b)",
   "out": "[1] \"a + b\"",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "bquote",
@@ -1594,7 +1594,7 @@
   "group": "Control flow & functions",
   "ex": "n <- 10\nbquote(x + .(n))",
   "out": "x + 10",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "eval",
@@ -1603,7 +1603,7 @@
   "group": "Control flow & functions",
   "ex": "eval(parse(text = \"1 + 2\"))",
   "out": "[1] 3",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "deparse",
@@ -1612,7 +1612,7 @@
   "group": "Control flow & functions",
   "ex": "deparse(quote(a * b))",
   "out": "[1] \"a * b\"",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "formals",
@@ -1621,7 +1621,7 @@
   "group": "Control flow & functions",
   "ex": "names(formals(function(a, b = 2) NULL))",
   "out": "[1] \"a\" \"b\"",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "body",
@@ -1630,7 +1630,7 @@
   "group": "Control flow & functions",
   "ex": "body(function(x) x + 1)",
   "out": "x + 1",
-  "lesson": "r-perf"
+  "lesson": "r-functions"
  },
  {
   "name": "environment",
@@ -1639,7 +1639,7 @@
   "group": "Control flow & functions",
   "ex": "f <- function() 1\nclass(environment(f))",
   "out": "[1] \"environment\"",
-  "lesson": "r-environments"
+  "lesson": "r-functions"
  },
  {
   "name": "new.env",
@@ -1648,7 +1648,7 @@
   "group": "Control flow & functions",
   "ex": "e <- new.env()\nassign(\"k\", 5, envir = e)\nget(\"k\", envir = e)",
   "out": "[1] 5",
-  "lesson": "r-environments"
+  "lesson": "r-functions"
  },
  {
   "name": "assign",
@@ -1657,7 +1657,7 @@
   "group": "Control flow & functions",
   "ex": "assign(\"v\", 10)\nv",
   "out": "[1] 10",
-  "lesson": "r-environments"
+  "lesson": "r-functions"
  },
  {
   "name": "get",
@@ -1666,7 +1666,7 @@
   "group": "Control flow & functions",
   "ex": "val <- 4\nget(\"val\")",
   "out": "[1] 4",
-  "lesson": "r-environments"
+  "lesson": "r-functions"
  },
  {
   "name": "exists",
@@ -1675,7 +1675,7 @@
   "group": "Control flow & functions",
   "ex": "exists(\"definitely_not_defined_xyz\")",
   "out": "[1] FALSE",
-  "lesson": "r-environments"
+  "lesson": "r-functions"
  },
  {
   "name": "<<-",
@@ -1684,7 +1684,7 @@
   "group": "Control flow & functions",
   "ex": "counter <- function() { n <- 0; function() { n <<- n + 1; n } }\nc1 <- counter()\nc1(); c1()",
   "out": "[1] 1\n[1] 2",
-  "lesson": "r-environments"
+  "lesson": "r-functions"
  },
  {
   "name": "local",
@@ -1693,7 +1693,7 @@
   "group": "Control flow & functions",
   "ex": "local({ a <- 2; a * 3 })",
   "out": "[1] 6",
-  "lesson": "r-environments"
+  "lesson": "r-functions"
  },
  {
   "name": "Negate",
@@ -1702,7 +1702,7 @@
   "group": "Control flow & functions",
   "ex": "Filter(Negate(is.na), c(1, NA, 3))",
   "out": "[1] 1 3",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "identity",
@@ -1711,7 +1711,7 @@
   "group": "Control flow & functions",
   "ex": "identity(5)",
   "out": "[1] 5",
-  "lesson": "r-functional"
+  "lesson": "r-iteration"
  },
  {
   "name": "is.function",
@@ -1747,7 +1747,7 @@
   "group": "Control flow & functions",
   "ex": "set.seed(1)\nrunif(2) == { set.seed(1); runif(2) }",
   "out": "[1] TRUE TRUE",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "data.frame",
@@ -1819,7 +1819,7 @@
   "group": "Data frames & matrices",
   "ex": "subset(mtcars, mpg > 30, select = c(mpg, cyl))",
   "out": "                mpg cyl\nFiat 128       32.4   4\nHonda Civic    30.4   4\nToyota Corolla 33.9   4\nLotus Europa   30.4   4",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "with",
@@ -1828,7 +1828,7 @@
   "group": "Data frames & matrices",
   "ex": "with(mtcars, mean(mpg[cyl == 4]))",
   "out": "[1] 26.66364",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "within",
@@ -1837,7 +1837,7 @@
   "group": "Data frames & matrices",
   "ex": "head(within(mtcars[1:3, 1:2], kpl <- round(mpg * 0.425, 1)), 2)",
   "out": "              mpg cyl kpl\nMazda RX4      21   6 8.9\nMazda RX4 Wag  21   6 8.9",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "transform",
@@ -1846,7 +1846,7 @@
   "group": "Data frames & matrices",
   "ex": "transform(data.frame(a = 1:2), b = a * 10)",
   "out": "  a  b\n1 1 10\n2 2 20",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "merge",
@@ -1855,7 +1855,7 @@
   "group": "Data frames & matrices",
   "ex": "merge(data.frame(id = 1:3, a = c(\"x\", \"y\", \"z\")), data.frame(id = c(1, 3), b = c(TRUE, FALSE)))",
   "out": "  id a     b\n1  1 x  TRUE\n2  3 z FALSE",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "rbind",
@@ -1864,7 +1864,7 @@
   "group": "Data frames & matrices",
   "ex": "rbind(data.frame(a = 1, b = \"x\"), data.frame(a = 2, b = \"y\"))",
   "out": "  a b\n1 1 x\n2 2 y",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "cbind",
@@ -1873,7 +1873,7 @@
   "group": "Data frames & matrices",
   "ex": "cbind(a = 1:2, b = 3:4)",
   "out": "     a b\n[1,] 1 3\n[2,] 2 4",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "aggregate",
@@ -1891,7 +1891,7 @@
   "group": "Data frames & matrices",
   "ex": "head(mtcars[order(-mtcars$mpg), c(\"mpg\", \"cyl\")], 3)",
   "out": "                mpg cyl\nToyota Corolla 33.9   4\nFiat 128       32.4   4\nHonda Civic    30.4   4",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "complete.cases",
@@ -1927,7 +1927,7 @@
   "group": "Data frames & matrices",
   "ex": "nrow(expand.grid(a = 1:3, b = c(\"x\", \"y\")))",
   "out": "[1] 6",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "reshape",
@@ -1936,7 +1936,7 @@
   "group": "Data frames & matrices",
   "ex": "w <- data.frame(id = 1:2, t1 = c(5, 6), t2 = c(7, 8))\nl <- reshape(w, direction = \"long\", varying = c(\"t1\", \"t2\"), v.names = \"val\", timevar = \"time\", idvar = \"id\")\nnrow(l)",
   "out": "[1] 4",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "unsplit",
@@ -1954,7 +1954,7 @@
   "group": "Data frames & matrices",
   "ex": "matrix(1:6, nrow = 2, byrow = TRUE)",
   "out": "     [,1] [,2] [,3]\n[1,]    1    2    3\n[2,]    4    5    6",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "t",
@@ -1963,7 +1963,7 @@
   "group": "Data frames & matrices",
   "ex": "t(matrix(1:6, 2))",
   "out": "     [,1] [,2]\n[1,]    1    2\n[2,]    3    4\n[3,]    5    6",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "%*%",
@@ -1972,7 +1972,7 @@
   "group": "Data frames & matrices",
   "ex": "matrix(1:4, 2) %*% matrix(1:4, 2)",
   "out": "     [,1] [,2]\n[1,]    7   15\n[2,]   10   22",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "solve",
@@ -1981,7 +1981,7 @@
   "group": "Data frames & matrices",
   "ex": "solve(matrix(c(2, 0, 0, 2), 2))",
   "out": "     [,1] [,2]\n[1,]  0.5  0.0\n[2,]  0.0  0.5",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "diag",
@@ -1990,7 +1990,7 @@
   "group": "Data frames & matrices",
   "ex": "diag(2)",
   "out": "     [,1] [,2]\n[1,]    1    0\n[2,]    0    1",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "det",
@@ -1999,7 +1999,7 @@
   "group": "Data frames & matrices",
   "ex": "det(matrix(c(1, 2, 3, 4), 2))",
   "out": "[1] -2",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "crossprod",
@@ -2008,7 +2008,7 @@
   "group": "Data frames & matrices",
   "ex": "crossprod(matrix(1:4, 2))",
   "out": "     [,1] [,2]\n[1,]    5   11\n[2,]   11   25",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "eigen",
@@ -2017,7 +2017,7 @@
   "group": "Data frames & matrices",
   "ex": "round(eigen(matrix(c(2, 0, 0, 3), 2))$values, 3)",
   "out": "[1] 3 2",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "sweep",
@@ -2026,7 +2026,7 @@
   "group": "Data frames & matrices",
   "ex": "sweep(matrix(1:6, 2), 2, c(1, 2, 3))",
   "out": "     [,1] [,2] [,3]\n[1,]    0    1    2\n[2,]    1    2    3",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "dimnames",
@@ -2035,7 +2035,7 @@
   "group": "Data frames & matrices",
   "ex": "m <- matrix(1:4, 2, dimnames = list(c(\"a\", \"b\"), c(\"x\", \"y\")))\ndimnames(m)",
   "out": "[[1]]\n[1] \"a\" \"b\"\n\n[[2]]\n[1] \"x\" \"y\"",
-  "lesson": "r-matrices"
+  "lesson": "r-dataframes"
  },
  {
   "name": "row.names",
@@ -2062,7 +2062,7 @@
   "group": "Data frames & matrices",
   "ex": "ds <- list(data.frame(id = 1:2, a = 3:4), data.frame(id = 1:2, b = 5:6))\nReduce(function(a, b) merge(a, b, by = \"id\"), ds)",
   "out": "  id a b\n1  1 3 5\n2  2 4 6",
-  "lesson": "r-datamanip"
+  "lesson": "r-dataframes"
  },
  {
   "name": "read.csv",
@@ -2206,7 +2206,7 @@
   "group": "Input / output",
   "ex": "class(Sys.Date())",
   "out": "[1] \"Date\"",
-  "lesson": "r-dates"
+  "lesson": "r-dataframes"
  },
  {
   "name": "file.remove",
@@ -2251,7 +2251,7 @@
   "group": "Distributions & simulation",
   "ex": "set.seed(1)\nround(rnorm(3), 4)",
   "out": "[1] -0.6265  0.1836 -0.8356",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "dnorm",
@@ -2260,7 +2260,7 @@
   "group": "Distributions & simulation",
   "ex": "round(dnorm(0), 5)",
   "out": "[1] 0.39894",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "pnorm",
@@ -2269,7 +2269,7 @@
   "group": "Distributions & simulation",
   "ex": "round(pnorm(1.96), 4)",
   "out": "[1] 0.975",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "qnorm",
@@ -2278,7 +2278,7 @@
   "group": "Distributions & simulation",
   "ex": "round(qnorm(0.975), 4)",
   "out": "[1] 1.96",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "runif",
@@ -2287,7 +2287,7 @@
   "group": "Distributions & simulation",
   "ex": "set.seed(2)\nlength(runif(5))",
   "out": "[1] 5",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "dbinom",
@@ -2296,7 +2296,7 @@
   "group": "Distributions & simulation",
   "ex": "dbinom(3, 10, 0.5)",
   "out": "[1] 0.1171875",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "pbinom",
@@ -2305,7 +2305,7 @@
   "group": "Distributions & simulation",
   "ex": "pbinom(3, 10, 0.5)",
   "out": "[1] 0.171875",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "rbinom",
@@ -2314,7 +2314,7 @@
   "group": "Distributions & simulation",
   "ex": "set.seed(3)\nlength(rbinom(4, 10, 0.5))",
   "out": "[1] 4",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "dpois",
@@ -2323,7 +2323,7 @@
   "group": "Distributions & simulation",
   "ex": "round(dpois(2, 3), 4)",
   "out": "[1] 0.224",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "ppois",
@@ -2332,7 +2332,7 @@
   "group": "Distributions & simulation",
   "ex": "round(ppois(2, 3), 4)",
   "out": "[1] 0.4232",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "rpois",
@@ -2341,7 +2341,7 @@
   "group": "Distributions & simulation",
   "ex": "set.seed(4)\nlength(rpois(3, 2))",
   "out": "[1] 3",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "dexp",
@@ -2350,7 +2350,7 @@
   "group": "Distributions & simulation",
   "ex": "round(dexp(1, 2), 4)",
   "out": "[1] 0.2707",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "pexp",
@@ -2359,7 +2359,7 @@
   "group": "Distributions & simulation",
   "ex": "round(pexp(1, 2), 4)",
   "out": "[1] 0.8647",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "pt",
@@ -2395,7 +2395,7 @@
   "group": "Distributions & simulation",
   "ex": "set.seed(42)\nlength(sample(1:6, 10, replace = TRUE))",
   "out": "[1] 10",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "replicate",
@@ -2404,7 +2404,7 @@
   "group": "Distributions & simulation",
   "ex": "set.seed(1)\nlength(replicate(100, mean(rnorm(5))))",
   "out": "[1] 100",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "sample.int",
@@ -2413,7 +2413,7 @@
   "group": "Distributions & simulation",
   "ex": "set.seed(5)\nlength(sample.int(10, 3))",
   "out": "[1] 3",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "density",
@@ -2422,7 +2422,7 @@
   "group": "Distributions & simulation",
   "ex": "class(density(c(1, 2, 3, 4)))",
   "out": "[1] \"density\"",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "ecdf",
@@ -2431,7 +2431,7 @@
   "group": "Distributions & simulation",
   "ex": "e <- ecdf(c(1, 2, 2, 3))\ne(2)",
   "out": "[1] 0.75",
-  "lesson": "r-prob"
+  "lesson": "r-inference"
  },
  {
   "name": "t.test",
@@ -2521,7 +2521,7 @@
   "group": "Tests & models",
   "ex": "round(summary(aov(weight ~ group, data = PlantGrowth))[[1]][[\"F value\"]][1], 4)",
   "out": "[1] 4.8461",
-  "lesson": "r-anova"
+  "lesson": "r-inference"
  },
  {
   "name": "TukeyHSD",
@@ -2530,7 +2530,7 @@
   "group": "Tests & models",
   "ex": "round(TukeyHSD(aov(weight ~ group, data = PlantGrowth))$group[, \"p adj\"], 4)",
   "out": "trt1-ctrl trt2-ctrl trt2-trt1 \n   0.3909    0.1980    0.0120",
-  "lesson": "r-anova"
+  "lesson": "r-inference"
  },
  {
   "name": "kruskal.test",
@@ -2539,7 +2539,7 @@
   "group": "Tests & models",
   "ex": "round(kruskal.test(weight ~ group, data = PlantGrowth)$p.value, 4)",
   "out": "[1] 0.0184",
-  "lesson": "r-anova"
+  "lesson": "r-inference"
  },
  {
   "name": "p.adjust",
@@ -2548,7 +2548,7 @@
   "group": "Tests & models",
   "ex": "p.adjust(c(0.01, 0.02, 0.04), method = \"bonferroni\")",
   "out": "[1] 0.03 0.06 0.12",
-  "lesson": "r-anova"
+  "lesson": "r-inference"
  },
  {
   "name": "anova",
@@ -2557,7 +2557,7 @@
   "group": "Tests & models",
   "ex": "round(anova(lm(mpg ~ wt, mtcars), lm(mpg ~ wt + hp, mtcars))[[\"Pr(>F)\"]][2], 5)",
   "out": "[1] 0.00145",
-  "lesson": "r-anova"
+  "lesson": "r-inference"
  },
  {
   "name": "lm",
@@ -2620,7 +2620,7 @@
   "group": "Tests & models",
   "ex": "round(coef(glm(am ~ wt, data = mtcars, family = binomial)), 3)",
   "out": "(Intercept)          wt \n     12.040      -4.024",
-  "lesson": "r-glm"
+  "lesson": "r-lm"
  },
  {
   "name": "AIC",
@@ -2629,7 +2629,7 @@
   "group": "Tests & models",
   "ex": "round(AIC(glm(am ~ wt, data = mtcars, family = binomial)), 3)",
   "out": "[1] 23.176",
-  "lesson": "r-glm"
+  "lesson": "r-lm"
  },
  {
   "name": "deviance",
@@ -2638,7 +2638,7 @@
   "group": "Tests & models",
   "ex": "round(deviance(glm(am ~ wt, data = mtcars, family = binomial)), 3)",
   "out": "[1] 19.176",
-  "lesson": "r-glm"
+  "lesson": "r-lm"
  },
  {
   "name": "nls",
@@ -2647,7 +2647,7 @@
   "group": "Tests & models",
   "ex": "x <- 1:6\ny <- c(2.7, 3.6, 4.9, 6.7, 9.1, 12.2)\nround(coef(nls(y ~ a * exp(b * x), start = list(a = 1, b = 0.1))), 3)",
   "out": "    a     b \n1.986 0.303",
-  "lesson": "r-optim"
+  "lesson": "r-lm"
  },
  {
   "name": "optim",
@@ -2656,7 +2656,7 @@
   "group": "Tests & models",
   "ex": "round(optim(c(0, 0), function(p) (p[1] - 1)^2 + (p[2] + 2)^2, method = \"BFGS\")$par, 3)",
   "out": "[1]  1 -2",
-  "lesson": "r-optim"
+  "lesson": "r-lm"
  },
  {
   "name": "optimize",
@@ -2665,7 +2665,7 @@
   "group": "Tests & models",
   "ex": "round(optimize(function(x) (x - 3)^2, c(0, 10))$minimum, 3)",
   "out": "[1] 3",
-  "lesson": "r-optim"
+  "lesson": "r-lm"
  },
  {
   "name": "uniroot",
@@ -2674,7 +2674,7 @@
   "group": "Tests & models",
   "ex": "round(uniroot(function(x) x^2 - 2, c(0, 2))$root, 3)",
   "out": "[1] 1.414",
-  "lesson": "r-optim"
+  "lesson": "r-lm"
  },
  {
   "name": "integrate",
@@ -2683,7 +2683,7 @@
   "group": "Tests & models",
   "ex": "round(integrate(dnorm, -1.96, 1.96)$value, 4)",
   "out": "[1] 0.95",
-  "lesson": "r-optim"
+  "lesson": "r-lm"
  },
  {
   "name": "D",
@@ -2692,7 +2692,7 @@
   "group": "Tests & models",
   "ex": "D(quote(x^2 + 3 * x), \"x\")",
   "out": "2 * x + 3",
-  "lesson": "r-optim"
+  "lesson": "r-lm"
  },
  {
   "name": "model.matrix",
@@ -2701,7 +2701,7 @@
   "group": "Tests & models",
   "ex": "dim(model.matrix(~ group, data = PlantGrowth))",
   "out": "[1] 30  3",
-  "lesson": "r-anova"
+  "lesson": "r-inference"
  },
  {
   "name": "UseMethod",
@@ -2773,7 +2773,7 @@
   "group": "OOP: S3, S4, Reference classes",
   "ex": "Ops.money <- function(e1, e2) { v <- get(.Generic)(unclass(e1), unclass(e2)); if (.Generic %in% c(\"+\", \"-\")) structure(v, class = \"money\") else v }\nunclass(structure(2, class = \"money\") + structure(3, class = \"money\"))",
   "out": "[1] 5",
-  "lesson": "r-s3-ops"
+  "lesson": "r-s3"
  },
  {
   "name": "methods",
@@ -2872,7 +2872,7 @@
   "group": "OOP: S3, S4, Reference classes",
   "ex": "Acc <- setRefClass(\"Acc\", fields = list(bal = \"numeric\"), methods = list(add = function(x) { bal <<- bal + x; invisible(.self) }))\na <- Acc$new(bal = 10)\na$add(5)\na$bal",
   "out": "[1] 15",
-  "lesson": "r-r5"
+  "lesson": "r-s4"
  },
  {
   "name": "callSuper",
@@ -2881,7 +2881,7 @@
   "group": "OOP: S3, S4, Reference classes",
   "ex": "P <- setRefClass(\"P\", fields = list(), methods = list(hi = function() \"P\"))\nC <- setRefClass(\"C\", contains = \"P\", methods = list(hi = function() paste(\"C >\", callSuper())))\nC$new()$hi()",
   "out": "[1] \"C > P\"",
-  "lesson": "r-r5"
+  "lesson": "r-s4"
  }
 ];
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -2,17 +2,19 @@
 
 An interactive learning platform in the style of [boot.dev](https://boot.dev): short reading on the left, a real workspace on the right, instant feedback, XP and skill points, and spaced-repetition review so what you learn actually sticks.
 
-**Courses: 119 lessons, 295 practice drills, 5 capstones, 550+ recall cards.**
+**Five focused courses, each finishable in 1-2 weeks at about an hour a day** (the course page shows the estimate): 71 lessons in total, each with one optional practice drill and 3 recall cards.
 
-| Course | Lessons | Drills | Highlights |
-|---|---|---|---|
-| Python | 39 | 114 | strings, collections, closures, generators, decorators, files/JSON, stdlib, **classes → inheritance → polymorphism → composition → ABCs → properties → dataclasses**, typing, testing, algorithms, `asyncio`; capstone: text-adventure engine |
-| R (base R) | 31 | 89 | vectors to data frames, regex, dates, functional tools, environments, error handling, **S3 → S4 → Reference-class inheritance**, simulation, hypothesis tests, ANOVA, `glm`, `optim`, metaprogramming; capstone: survey-analysis pipeline with an S4 report |
-| Git | 17 | 32 | branches, merge & conflicts, **rebase, cherry-pick, reflog recovery, bisect**, tags, clean, stash; capstone: rescue a broken repo |
-| GitHub | 15 | 28 | remotes, PRs, **code review, branch protection, conflicting PRs**, forks, releases, Actions (matrix/cache/secrets), Dependabot, CODEOWNERS; capstone: ship a contribution |
-| Docker | 17 | 32 | containers, volumes & bind mounts, Dockerfiles, **`.dockerignore`, multi-stage builds, healthchecks, networking & DNS, registries, debugging crash loops, resource limits**, Compose (env files, profiles, healthy dependencies); capstone: a two-service stack |
+| Course | Lessons | Highlights |
+|---|---|---|
+| Python | 17 | basics, strings, lists, dicts, functions, errors, files/JSON, stdlib, **classes and inheritance**, **logging and debugging**, testing, **scripts (argparse, environment variables, exit codes)**; capstone: a log analyser that produces a health report |
+| R (base R) | 15 | vectors, strings, statistics, data frames, grouping, functions, loops, errors, I/O, **S3 and S4 inheritance**, hypothesis tests, linear models; capstone: survey-analysis pipeline with an S4 report |
+| Git | 12 | commits, branches, merge and conflicts, rebase, undo, stash, **reflog recovery**; capstone: rescue a broken repo |
+| GitHub | 11 | remotes, pull requests, **code review, branch protection**, issues, forks, **Actions (matrix, cache, secrets)**; capstone: ship a contribution |
+| Docker | 12 | containers, volumes, Dockerfiles, **healthchecks, debugging with logs and exit codes, resource limits (stats)**, networking, Compose; capstone: ship and monitor a two-service stack |
 
-Plus a searchable **Reference** page (see below).
+The scope is "what you need to build software and keep it running": reading and writing code, version control and collaboration, tests, logging, CI and container health. Deliberately left out: advanced language features (generators, decorators, async), exotic Git commands, registries and orchestration.
+
+Plus a searchable **Reference** page (see below), which also covers topics the lessons skip.
 
 It is a **static site with no build step**: HTML, CSS and plain JavaScript.
 
@@ -37,7 +39,7 @@ The first Python / R lesson downloads its runtime from a CDN once (Pyodide ≈ 1
 | **Hidden tests** | Python/R lessons run your code against hidden checks and tell you *what* is wrong. Terminal and file lessons show a **live checklist** that ticks as you work. |
 | **XP with a performance multiplier** | A perfect first try with no hints earns **+25%**. Each failed submit costs 15% and each hint 10% (floor 40%). Revealing the solution forfeits the lesson's XP. XP is only awarded on first completion, so grinding replays does nothing. |
 | **Skill points & mastery** | Every lesson trains a skill (Basics, Control flow, Branching, Compose…). 1-3 ★ × difficulty skill points are awarded, and skills climb Novice → Apprentice → Adept → Expert → Master. |
-| **Practice drills** | Every lesson is followed by 2-3 short **drills**: variations on what you just learned (different data, a new constraint, "now without a loop"). They earn smaller XP, count as practice, and the *Next* button walks you through them. Skip any you like. |
+| **Practice drills** | Every lesson has one short **drill**: variations on what you just learned (different data, a new constraint, "now without a loop"). They are **optional**: they earn smaller XP and a badge, and *Next* always goes to the next lesson, so you never have to do them. |
 | **Capstones** | Each course ends with a larger project that combines the whole course. |
 | **Lock it in** | Right after a lesson you answer one retrieval question for a bonus. Retrieval beats re-reading. |
 | **Spaced repetition** | Every lesson plants recall cards in a Leitner system (1, 2, 4, 8, 16, 32 day boxes). Right answers promote a card; wrong answers send it back to box 1. |
@@ -87,7 +89,7 @@ The test suite refuses a lesson whose starter already passes or whose reference 
 ## Tests
 
 ```bash
-npm test            # ~470 tests: every lesson and drill's solution vs. real python3/Rscript, the sandbox engines, XP/SRS rules, the reference examples, and a content-quality gate (2+ drills and 4+ recall cards per lesson, a capstone per course)
+npm test            # ~180 tests: every lesson and drill's solution vs. real python3/Rscript, the sandbox engines, XP/SRS rules, the reference examples, and a content-quality gate (one drill and 3 recall cards per lesson, a capstone per course, finishable in two weeks)
 RUNTIME_ONLY=python node --test tests/runtime.test.js   # all Python solutions in REAL Pyodide (also: =r for WebR)
 npm install && npm run test:e2e   # Chromium end-to-end run using the REAL Pyodide and WebR from node_modules
 ```

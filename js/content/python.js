@@ -5,7 +5,7 @@
   (LP.courses = LP.courses || []).push({
     id: 'python', title: 'Python', icon: '🐍', color: '#4b8bbe', engine: 'python',
     blurb: 'From print() to classes. Write real code, get instant feedback from hidden tests.',
-    skills: ['Basics', 'Functions', 'Control flow', 'Data structures', 'Errors', 'OOP'],
+    skills: ['Basics', 'Strings', 'Control flow', 'Functions', 'Data structures', 'Errors', 'Files & Data', 'Modules', 'OOP', 'Inheritance', 'Reliability', 'Projects'],
     lessons: [
       {
         id: 'py-hello', title: 'Hello, world', skill: 'Basics', xp: 15, diff: 1,
@@ -84,54 +84,7 @@ assert _out.strip() == "Ada has 70 HP left", f"Expected 'Ada has 70 HP left' but
           { type: 'choice', q: 'What type is the value `3.0`?', options: ['int', 'float', 'str', 'bool'], answer: 1, why: 'A number with a decimal point is a float, even when it is a whole value.' },
         ],
       },
-      {
-        id: 'py-numbers', title: 'Math & string tools', skill: 'Basics', xp: 25, diff: 2,
-        read: `
-# Operators and formatting
-
-~~~python
-7 + 2    # 9
-7 / 2    # 3.5   true division (always a float)
-7 // 2   # 3     floor division
-7 % 2    # 1     remainder ("modulo")
-7 ** 2   # 49    power
-~~~
-
-\`//\` and \`%\` are a pair: they split a number into "how many whole groups" and "what is left over".
-
-~~~python
-seconds = 135
-minutes = seconds // 60   # 2
-secs = seconds % 60       # 15
-~~~
-
-## Formatting numbers
-
-Inside an f-string, \`:02d\` means "pad with zeros to width 2":
-
-~~~python
-print(f"{minutes}:{secs:02d}")   # 2:15
-print(f"{5:02d}")                # 05
-~~~
-
-Strings have handy methods too: \`"abc".upper()\`, \`" hi ".strip()\`, \`len("abc")\`.
-`,
-        task: 'Given `seconds = 3725`, compute `hours`, `minutes` and `secs`, then print the time as `H:MM:SS` (so `1:02:05`).',
-        starter: 'seconds = 3725\n\nhours = \nminutes = \nsecs = \n\nprint()\n',
-        harness: r`
-assert seconds == 3725, "Leave seconds = 3725 alone"
-assert hours == 1, f"hours should be 1, got {hours!r}"
-assert minutes == 2, f"minutes should be 2 (the minutes left after removing whole hours), got {minutes!r}"
-assert secs == 5, f"secs should be 5, got {secs!r}"
-assert _out.strip() == "1:02:05", f"Expected 1:02:05 but got {_out.strip()!r}"
-`,
-        hints: ['`hours = seconds // 3600`; the rest is `seconds % 3600`.', '`minutes = (seconds % 3600) // 60` and `secs = seconds % 60`.', 'Print with `f"{hours}:{minutes:02d}:{secs:02d}"`.'],
-        solution: 'seconds = 3725\nhours = seconds // 3600\nminutes = (seconds % 3600) // 60\nsecs = seconds % 60\nprint(f"{hours}:{minutes:02d}:{secs:02d}")',
-        recall: [
-          { type: 'choice', q: 'What is `17 % 5`?', options: ['3', '2', '3.4', '12'], answer: 1, why: '17 = 3 x 5 + 2. `%` returns the remainder, 2.' },
-          { type: 'choice', q: 'What is `17 // 5`?', options: ['3', '2', '3.4', '4'], answer: 0, why: '`//` is floor division: how many whole 5s fit in 17.' },
-        ],
-      },
+      
       {
         id: 'py-functions', title: 'Functions', skill: 'Functions', xp: 25, diff: 2,
         read: `
@@ -160,6 +113,10 @@ power(3, 3)   # 27
 
 > [!warn] return is not print
 > \`print()\` shows a value to a human. \`return\` gives a value back to the *caller* so more code can use it. A function without \`return\` gives back \`None\`.
+
+## Also worth knowing: flexible arguments and lambdas
+
+\`def total(*nums)\` collects extra positional arguments into a tuple and \`def configure(**options)\` collects keyword arguments into a dict; \`f(*items)\` and \`f(**opts)\` spread them back out. A **lambda** is a tiny unnamed function, handy as a sort key: \`sorted(words, key=lambda w: len(w))\`.
 `,
         task: 'Write `greet(name, punctuation="!")` that **returns** (not prints) a greeting: `greet("Ada")` gives `Hello, Ada!` and `greet("Ada", ".")` gives `Hello, Ada.`',
         starter: 'def greet(name, punctuation="!"):\n    pass\n',
@@ -304,6 +261,10 @@ A compact way to build a new list from an old one:
 ~~~
 
 Read it as: *"give me \`expression\` for each \`x\` in \`xs\` (if \`condition\`)"*.
+
+## Also worth knowing: tuples and unpacking
+
+A **tuple** is an immutable list written with parentheses: \`point = (3, 4)\`. You can **unpack** any sequence into names: \`x, y = point\`, \`first, *rest = [1, 2, 3]\`, and swap values with \`a, b = b, a\`. Use tuples for fixed groups of values and \`set(...)\` when you only need unique items.
 `,
         task: 'Write `squares_of_odds(nums)` returning the squares of the odd numbers, in original order, using a **list comprehension**. Write `top_three(scores)` returning the 3 highest scores, highest first.',
         starter: 'def squares_of_odds(nums):\n    pass\n\n\ndef top_three(scores):\n    pass\n',

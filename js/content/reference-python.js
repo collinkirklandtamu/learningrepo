@@ -10,7 +10,7 @@
   "group": "Built-in functions",
   "ex": "print(abs(-7.5))",
   "out": "7.5",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "aiter",
@@ -19,7 +19,7 @@
   "group": "Built-in functions",
   "ex": "import asyncio\nasync def gen():\n    yield 1\nasync def main():\n    it = aiter(gen())\n    print(await anext(it))\nasyncio.run(main())",
   "out": "1",
-  "lesson": "py-advanced"
+  "lesson": "py-functions"
  },
  {
   "name": "all",
@@ -37,7 +37,7 @@
   "group": "Built-in functions",
   "ex": "import asyncio\nasync def gen():\n    yield \"a\"\nasync def main():\n    print(await anext(gen()))\nasyncio.run(main())",
   "out": "a",
-  "lesson": "py-advanced"
+  "lesson": "py-functions"
  },
  {
   "name": "any",
@@ -64,7 +64,7 @@
   "group": "Built-in functions",
   "ex": "print(bin(10))",
   "out": "0b1010",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "bool",
@@ -127,7 +127,7 @@
   "group": "Built-in functions",
   "ex": "class A:\n    @classmethod\n    def make(cls):\n        return cls()\nprint(type(A.make()).__name__)",
   "out": "A",
-  "lesson": "py-properties"
+  "lesson": "py-classes"
  },
  {
   "name": "compile",
@@ -136,7 +136,7 @@
   "group": "Built-in functions",
   "ex": "code = compile(\"1 + 2\", \"<s>\", \"eval\")\nprint(eval(code))",
   "out": "3",
-  "lesson": "py-advanced"
+  "lesson": "py-functions"
  },
  {
   "name": "complex",
@@ -145,7 +145,7 @@
   "group": "Built-in functions",
   "ex": "print(complex(1, 2) * 2)",
   "out": "(2+4j)",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "delattr",
@@ -181,7 +181,7 @@
   "group": "Built-in functions",
   "ex": "print(divmod(17, 5))",
   "out": "(3, 2)",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "enumerate",
@@ -199,7 +199,7 @@
   "group": "Built-in functions",
   "ex": "print(eval(\"2 ** 8\"))",
   "out": "256",
-  "lesson": "py-advanced"
+  "lesson": "py-functions"
  },
  {
   "name": "exec",
@@ -208,7 +208,7 @@
   "group": "Built-in functions",
   "ex": "exec(\"x = 5\\nprint(x * 2)\")",
   "out": "10",
-  "lesson": "py-advanced"
+  "lesson": "py-functions"
  },
  {
   "name": "filter",
@@ -217,7 +217,7 @@
   "group": "Built-in functions",
   "ex": "print(list(filter(lambda n: n % 2, range(8))))",
   "out": "[1, 3, 5, 7]",
-  "lesson": "py-lambda"
+  "lesson": "py-functions"
  },
  {
   "name": "float",
@@ -226,7 +226,7 @@
   "group": "Built-in functions",
   "ex": "print(float(\"3.5\"), float(2))",
   "out": "3.5 2.0",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "format",
@@ -244,7 +244,7 @@
   "group": "Built-in functions",
   "ex": "print(frozenset([1, 2, 2, 3]) == frozenset({1, 2, 3}))",
   "out": "True",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "getattr",
@@ -262,7 +262,7 @@
   "group": "Built-in functions",
   "ex": "y = 3\nprint(globals()[\"y\"])",
   "out": "3",
-  "lesson": "py-scope"
+  "lesson": "py-functions"
  },
  {
   "name": "hasattr",
@@ -298,7 +298,7 @@
   "group": "Built-in functions",
   "ex": "print(hex(255))",
   "out": "0xff",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "id",
@@ -307,7 +307,7 @@
   "group": "Built-in functions",
   "ex": "a = [1]\nb = a\nprint(id(a) == id(b), id(a) == id([1]))",
   "out": "True False",
-  "lesson": "py-mutability"
+  "lesson": "py-lists"
  },
  {
   "name": "input",
@@ -325,7 +325,7 @@
   "group": "Built-in functions",
   "ex": "print(int(\"42\"), int(3.9), int(\"ff\", 16))",
   "out": "42 3 255",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "isinstance",
@@ -352,7 +352,7 @@
   "group": "Built-in functions",
   "ex": "it = iter([1, 2])\nprint(next(it), next(it))",
   "out": "1 2",
-  "lesson": "py-iteration"
+  "lesson": "py-loops"
  },
  {
   "name": "len",
@@ -379,7 +379,7 @@
   "group": "Built-in functions",
   "ex": "def f(a):\n    b = 2\n    return sorted(locals())\nprint(f(1))",
   "out": "['a', 'b']",
-  "lesson": "py-scope"
+  "lesson": "py-functions"
  },
  {
   "name": "map",
@@ -388,7 +388,7 @@
   "group": "Built-in functions",
   "ex": "print(list(map(str.upper, [\"a\", \"b\"])), list(map(pow, [2, 3], [3, 2])))",
   "out": "['A', 'B'] [8, 9]",
-  "lesson": "py-lambda"
+  "lesson": "py-functions"
  },
  {
   "name": "max",
@@ -406,7 +406,7 @@
   "group": "Built-in functions",
   "ex": "m = memoryview(b\"abc\")\nprint(m[0], bytes(m[1:]))",
   "out": "97 b'bc'",
-  "lesson": "py-advanced"
+  "lesson": "py-functions"
  },
  {
   "name": "min",
@@ -424,7 +424,7 @@
   "group": "Built-in functions",
   "ex": "it = iter(\"a\")\nprint(next(it), next(it, \"done\"))",
   "out": "a done",
-  "lesson": "py-iteration"
+  "lesson": "py-loops"
  },
  {
   "name": "object",
@@ -442,7 +442,7 @@
   "group": "Built-in functions",
   "ex": "print(oct(8))",
   "out": "0o10",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "open",
@@ -469,7 +469,7 @@
   "group": "Built-in functions",
   "ex": "print(pow(2, 10), pow(2, 10, 1000))",
   "out": "1024 24",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "print",
@@ -487,7 +487,7 @@
   "group": "Built-in functions",
   "ex": "class C:\n    @property\n    def area(self):\n        return 6\nprint(C().area)",
   "out": "6",
-  "lesson": "py-properties"
+  "lesson": "py-classes"
  },
  {
   "name": "range",
@@ -523,7 +523,7 @@
   "group": "Built-in functions",
   "ex": "print(round(2.5), round(3.5), round(3.14159, 2))",
   "out": "2 4 3.14",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "set",
@@ -532,7 +532,7 @@
   "group": "Built-in functions",
   "ex": "print(sorted(set([3, 1, 3, 2])))",
   "out": "[1, 2, 3]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "setattr",
@@ -559,7 +559,7 @@
   "group": "Built-in functions",
   "ex": "print(sorted([\"b\", \"A\", \"c\"], key=str.lower, reverse=True))",
   "out": "['c', 'b', 'A']",
-  "lesson": "py-lambda"
+  "lesson": "py-functions"
  },
  {
   "name": "staticmethod",
@@ -568,7 +568,7 @@
   "group": "Built-in functions",
   "ex": "class M:\n    @staticmethod\n    def add(a, b):\n        return a + b\nprint(M.add(2, 3))",
   "out": "5",
-  "lesson": "py-properties"
+  "lesson": "py-classes"
  },
  {
   "name": "str",
@@ -604,7 +604,7 @@
   "group": "Built-in functions",
   "ex": "print(tuple([1, 2, 3]), (1,) + (2,))",
   "out": "(1, 2, 3) (1, 2)",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "type",
@@ -631,7 +631,7 @@
   "group": "Built-in functions",
   "ex": "print(list(zip(\"ab\", [1, 2, 3])))",
   "out": "[('a', 1), ('b', 2)]",
-  "lesson": "py-lambda"
+  "lesson": "py-functions"
  },
  {
   "name": "__import__",
@@ -676,7 +676,7 @@
   "group": "Built-in functions",
   "ex": "print(... is Ellipsis)",
   "out": "True",
-  "lesson": "py-typing"
+  "lesson": "py-functions"
  },
  {
   "name": "NotImplemented",
@@ -685,7 +685,7 @@
   "group": "Built-in functions",
   "ex": "class A:\n    def __eq__(self, o):\n        return NotImplemented\nprint(A() == 1)",
   "out": "False",
-  "lesson": "py-polymorphism"
+  "lesson": "py-inheritance"
  },
  {
   "name": "str.capitalize",
@@ -1135,7 +1135,7 @@
   "group": "list methods",
   "ex": "a = [1, [2]]\nb = a.copy()\nb[0] = 9\nprint(a, b)",
   "out": "[1, [2]] [9, [2]]",
-  "lesson": "py-mutability"
+  "lesson": "py-lists"
  },
  {
   "name": "list.count",
@@ -1207,7 +1207,7 @@
   "group": "list methods",
   "ex": "a = [\"bb\", \"a\", \"ccc\"]\na.sort(key=len, reverse=True)\nprint(a)",
   "out": "['ccc', 'bb', 'a']",
-  "lesson": "py-lambda"
+  "lesson": "py-functions"
  },
  {
   "name": "dict.clear",
@@ -1315,7 +1315,7 @@
   "group": "set methods",
   "ex": "s = {1}\ns.add(2)\nprint(sorted(s))",
   "out": "[1, 2]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.clear",
@@ -1324,7 +1324,7 @@
   "group": "set methods",
   "ex": "s = {1}\ns.clear()\nprint(s)",
   "out": "set()",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.copy",
@@ -1333,7 +1333,7 @@
   "group": "set methods",
   "ex": "s = {1, 2}\nt = s.copy()\nt.add(3)\nprint(sorted(s), sorted(t))",
   "out": "[1, 2] [1, 2, 3]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.difference",
@@ -1342,7 +1342,7 @@
   "group": "set methods",
   "ex": "print(sorted({1, 2, 3} - {2}))",
   "out": "[1, 3]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.difference_update",
@@ -1351,7 +1351,7 @@
   "group": "set methods",
   "ex": "a = {1, 2, 3}\na.difference_update({1})\nprint(sorted(a))",
   "out": "[2, 3]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.discard",
@@ -1360,7 +1360,7 @@
   "group": "set methods",
   "ex": "s = {1}\ns.discard(5)\nprint(s)",
   "out": "{1}",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.intersection",
@@ -1369,7 +1369,7 @@
   "group": "set methods",
   "ex": "print(sorted({1, 2, 3} & {2, 3, 4}))",
   "out": "[2, 3]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.intersection_update",
@@ -1378,7 +1378,7 @@
   "group": "set methods",
   "ex": "a = {1, 2, 3}\na.intersection_update({2, 3, 9})\nprint(sorted(a))",
   "out": "[2, 3]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.isdisjoint",
@@ -1387,7 +1387,7 @@
   "group": "set methods",
   "ex": "print({1, 2}.isdisjoint({3}))",
   "out": "True",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.issubset",
@@ -1396,7 +1396,7 @@
   "group": "set methods",
   "ex": "print({1}.issubset({1, 2}))",
   "out": "True",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.issuperset",
@@ -1405,7 +1405,7 @@
   "group": "set methods",
   "ex": "print({1, 2}.issuperset({1}))",
   "out": "True",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.pop",
@@ -1414,7 +1414,7 @@
   "group": "set methods",
   "ex": "s = {7}\nprint(s.pop(), s)",
   "out": "7 set()",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.remove",
@@ -1423,7 +1423,7 @@
   "group": "set methods",
   "ex": "s = {1, 2}\ns.remove(1)\nprint(s)",
   "out": "{2}",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.symmetric_difference",
@@ -1432,7 +1432,7 @@
   "group": "set methods",
   "ex": "print(sorted({1, 2} ^ {2, 3}))",
   "out": "[1, 3]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.union",
@@ -1441,7 +1441,7 @@
   "group": "set methods",
   "ex": "print(sorted({1} | {2}))",
   "out": "[1, 2]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "set.update",
@@ -1450,7 +1450,7 @@
   "group": "set methods",
   "ex": "s = {1}\ns.update([2, 3])\nprint(sorted(s))",
   "out": "[1, 2, 3]",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "tuple.count",
@@ -1459,7 +1459,7 @@
   "group": "tuple methods",
   "ex": "print((1, 2, 1).count(1))",
   "out": "2",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "tuple.index",
@@ -1468,7 +1468,7 @@
   "group": "tuple methods",
   "ex": "print((\"a\", \"b\").index(\"b\"))",
   "out": "1",
-  "lesson": "py-tuples-sets"
+  "lesson": "py-lists"
  },
  {
   "name": "math.ceil",
@@ -1576,7 +1576,7 @@
   "group": "math",
   "ex": "import math\nprint(0.1 + 0.2 == 0.3, math.isclose(0.1 + 0.2, 0.3))",
   "out": "False True",
-  "lesson": "py-numbers"
+  "lesson": "py-variables"
  },
  {
   "name": "math.isqrt",
@@ -1810,7 +1810,7 @@
   "group": "collections & itertools & functools",
   "ex": "from collections import Counter\nc = Counter(\"banana\")\nprint(c.most_common(2))",
   "out": "[('a', 3), ('n', 2)]",
-  "lesson": "py-collections"
+  "lesson": "py-stdlib"
  },
  {
   "name": "collections.defaultdict",
@@ -1819,7 +1819,7 @@
   "group": "collections & itertools & functools",
   "ex": "from collections import defaultdict\nd = defaultdict(list)\nd[\"a\"].append(1)\nprint(dict(d))",
   "out": "{'a': [1]}",
-  "lesson": "py-collections"
+  "lesson": "py-stdlib"
  },
  {
   "name": "collections.deque",
@@ -1828,7 +1828,7 @@
   "group": "collections & itertools & functools",
   "ex": "from collections import deque\nd = deque([1, 2, 3], maxlen=3)\nd.append(4)\nd.appendleft(0)\nprint(list(d))",
   "out": "[0, 2, 3]",
-  "lesson": "py-datastructs"
+  "lesson": "py-lists"
  },
  {
   "name": "collections.namedtuple",
@@ -1837,7 +1837,7 @@
   "group": "collections & itertools & functools",
   "ex": "from collections import namedtuple\nP = namedtuple(\"P\", \"x y\")\np = P(1, 2)\nprint(p.x, p)",
   "out": "1 P(x=1, y=2)",
-  "lesson": "py-collections"
+  "lesson": "py-stdlib"
  },
  {
   "name": "collections.OrderedDict",
@@ -1846,7 +1846,7 @@
   "group": "collections & itertools & functools",
   "ex": "from collections import OrderedDict\nd = OrderedDict(a=1, b=2)\nd.move_to_end(\"a\")\nprint(list(d))",
   "out": "['b', 'a']",
-  "lesson": "py-collections"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.chain",
@@ -1855,7 +1855,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import chain\nprint(list(chain([1], \"ab\")))",
   "out": "[1, 'a', 'b']",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.combinations",
@@ -1864,7 +1864,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import combinations\nprint(list(combinations(\"abc\", 2)))",
   "out": "[('a', 'b'), ('a', 'c'), ('b', 'c')]",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.count",
@@ -1873,7 +1873,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import count, islice\nprint(list(islice(count(5, 2), 3)))",
   "out": "[5, 7, 9]",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.cycle",
@@ -1882,7 +1882,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import cycle, islice\nprint(list(islice(cycle(\"ab\"), 5)))",
   "out": "['a', 'b', 'a', 'b', 'a']",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.groupby",
@@ -1891,7 +1891,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import groupby\nprint([(k, len(list(g))) for k, g in groupby(\"aabccc\")])",
   "out": "[('a', 2), ('b', 1), ('c', 3)]",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.islice",
@@ -1900,7 +1900,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import islice\nprint(list(islice(range(100), 3)))",
   "out": "[0, 1, 2]",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.permutations",
@@ -1909,7 +1909,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import permutations\nprint(len(list(permutations(\"abc\"))))",
   "out": "6",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.product",
@@ -1918,7 +1918,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import product\nprint(list(product(\"ab\", [1, 2])))",
   "out": "[('a', 1), ('a', 2), ('b', 1), ('b', 2)]",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "itertools.accumulate",
@@ -1927,7 +1927,7 @@
   "group": "collections & itertools & functools",
   "ex": "from itertools import accumulate\nprint(list(accumulate([1, 2, 3, 4])))",
   "out": "[1, 3, 6, 10]",
-  "lesson": "py-itertools"
+  "lesson": "py-stdlib"
  },
  {
   "name": "functools.reduce",
@@ -1936,7 +1936,7 @@
   "group": "collections & itertools & functools",
   "ex": "from functools import reduce\nprint(reduce(lambda a, b: a * b, [1, 2, 3, 4]))",
   "out": "24",
-  "lesson": "py-lambda"
+  "lesson": "py-functions"
  },
  {
   "name": "functools.lru_cache",
@@ -1945,7 +1945,7 @@
   "group": "collections & itertools & functools",
   "ex": "from functools import lru_cache\n@lru_cache(maxsize=None)\ndef fib(n):\n    return n if n < 2 else fib(n - 1) + fib(n - 2)\nprint(fib(50))",
   "out": "12586269025",
-  "lesson": "py-recursion"
+  "lesson": "py-functions"
  },
  {
   "name": "functools.partial",
@@ -1954,7 +1954,7 @@
   "group": "collections & itertools & functools",
   "ex": "from functools import partial\ndouble = partial(pow, exp=2)\nprint(double(5))",
   "out": "25",
-  "lesson": "py-lambda"
+  "lesson": "py-functions"
  },
  {
   "name": "functools.wraps",
@@ -1963,7 +1963,7 @@
   "group": "collections & itertools & functools",
   "ex": "from functools import wraps\ndef deco(f):\n    @wraps(f)\n    def inner(*a):\n        return f(*a)\n    return inner\n@deco\ndef hi():\n    \"doc\"\nprint(hi.__name__)",
   "out": "hi",
-  "lesson": "py-decorators"
+  "lesson": "py-functions"
  },
  {
   "name": "re.findall",
@@ -1972,7 +1972,7 @@
   "group": "re, json, datetime, pathlib",
   "ex": "import re\nprint(re.findall(r\"\\d+\", \"a1 b22 c333\"))",
   "out": "['1', '22', '333']",
-  "lesson": "py-regex"
+  "lesson": "py-stdlib"
  },
  {
   "name": "re.match",
@@ -1981,7 +1981,7 @@
   "group": "re, json, datetime, pathlib",
   "ex": "import re\nm = re.match(r\"(\\w+)@(\\w+)\", \"ada@lab\")\nprint(m.groups())",
   "out": "('ada', 'lab')",
-  "lesson": "py-regex"
+  "lesson": "py-stdlib"
  },
  {
   "name": "re.search",
@@ -1990,7 +1990,7 @@
   "group": "re, json, datetime, pathlib",
   "ex": "import re\nprint(re.search(r\"\\d+\", \"ab12cd\").group())",
   "out": "12",
-  "lesson": "py-regex"
+  "lesson": "py-stdlib"
  },
  {
   "name": "re.sub",
@@ -1999,7 +1999,7 @@
   "group": "re, json, datetime, pathlib",
   "ex": "import re\nprint(re.sub(r\"\\s+\", \" \", \"a   b \\n c\"))",
   "out": "a b c",
-  "lesson": "py-regex"
+  "lesson": "py-stdlib"
  },
  {
   "name": "re.split",
@@ -2008,7 +2008,7 @@
   "group": "re, json, datetime, pathlib",
   "ex": "import re\nprint(re.split(r\"[,;]\\s*\", \"a, b;c\"))",
   "out": "['a', 'b', 'c']",
-  "lesson": "py-regex"
+  "lesson": "py-stdlib"
  },
  {
   "name": "re.compile",
@@ -2017,7 +2017,7 @@
   "group": "re, json, datetime, pathlib",
   "ex": "import re\nr = re.compile(r\"^\\d{3}$\")\nprint(bool(r.match(\"123\")), bool(r.match(\"12\")))",
   "out": "True False",
-  "lesson": "py-regex"
+  "lesson": "py-stdlib"
  },
  {
   "name": "re.fullmatch",
@@ -2026,7 +2026,7 @@
   "group": "re, json, datetime, pathlib",
   "ex": "import re\nprint(bool(re.fullmatch(r\"\\d+\", \"123\")), bool(re.fullmatch(r\"\\d+\", \"12a\")))",
   "out": "True False",
-  "lesson": "py-regex"
+  "lesson": "py-stdlib"
  },
  {
   "name": "json.dumps",
@@ -2161,7 +2161,7 @@
   "group": "dunder & classes",
   "ex": "class P:\n    def __str__(self):\n        return \"P!\"\nprint(P())",
   "out": "P!",
-  "lesson": "py-polymorphism"
+  "lesson": "py-inheritance"
  },
  {
   "name": "__repr__",
@@ -2170,7 +2170,7 @@
   "group": "dunder & classes",
   "ex": "class P:\n    def __repr__(self):\n        return \"P()\"\nprint([P()])",
   "out": "[P()]",
-  "lesson": "py-polymorphism"
+  "lesson": "py-inheritance"
  },
  {
   "name": "__eq__",
@@ -2179,7 +2179,7 @@
   "group": "dunder & classes",
   "ex": "class P:\n    def __init__(self, n):\n        self.n = n\n    def __eq__(self, o):\n        return self.n == o.n\nprint(P(1) == P(1))",
   "out": "True",
-  "lesson": "py-polymorphism"
+  "lesson": "py-inheritance"
  },
  {
   "name": "__lt__",
@@ -2188,7 +2188,7 @@
   "group": "dunder & classes",
   "ex": "class P:\n    def __init__(self, n):\n        self.n = n\n    def __lt__(self, o):\n        return self.n < o.n\nprint(sorted([P(2), P(1)])[0].n)",
   "out": "1",
-  "lesson": "py-polymorphism"
+  "lesson": "py-inheritance"
  },
  {
   "name": "__add__",
@@ -2197,7 +2197,7 @@
   "group": "dunder & classes",
   "ex": "class V:\n    def __init__(self, x):\n        self.x = x\n    def __add__(self, o):\n        return V(self.x + o.x)\nprint((V(1) + V(2)).x)",
   "out": "3",
-  "lesson": "py-polymorphism"
+  "lesson": "py-inheritance"
  },
  {
   "name": "__len__",
@@ -2206,7 +2206,7 @@
   "group": "dunder & classes",
   "ex": "class B:\n    def __len__(self):\n        return 3\nprint(len(B()))",
   "out": "3",
-  "lesson": "py-polymorphism"
+  "lesson": "py-inheritance"
  },
  {
   "name": "__getitem__",
@@ -2215,7 +2215,7 @@
   "group": "dunder & classes",
   "ex": "class B:\n    def __getitem__(self, i):\n        return i * 2\nprint(B()[4])",
   "out": "8",
-  "lesson": "py-polymorphism"
+  "lesson": "py-inheritance"
  },
  {
   "name": "__iter__",
@@ -2224,7 +2224,7 @@
   "group": "dunder & classes",
   "ex": "class C:\n    def __iter__(self):\n        yield 1\n        yield 2\nprint(list(C()))",
   "out": "[1, 2]",
-  "lesson": "py-generators"
+  "lesson": "py-loops"
  },
  {
   "name": "__call__",
@@ -2233,7 +2233,7 @@
   "group": "dunder & classes",
   "ex": "class Adder:\n    def __init__(self, n):\n        self.n = n\n    def __call__(self, x):\n        return x + self.n\nprint(Adder(5)(1))",
   "out": "6",
-  "lesson": "py-decorators"
+  "lesson": "py-functions"
  },
  {
   "name": "__enter__",
@@ -2242,7 +2242,7 @@
   "group": "dunder & classes",
   "ex": "class T:\n    def __enter__(self):\n        print(\"in\")\n        return self\n    def __exit__(self, *a):\n        print(\"out\")\nwith T():\n    print(\"body\")",
   "out": "in\nbody\nout",
-  "lesson": "py-context"
+  "lesson": "py-files"
  },
  {
   "name": "__slots__",
@@ -2251,7 +2251,7 @@
   "group": "dunder & classes",
   "ex": "class P:\n    __slots__ = (\"a\",)\ntry:\n    P().b = 1\nexcept AttributeError:\n    print(\"no b\")",
   "out": "no b",
-  "lesson": "py-advanced"
+  "lesson": "py-functions"
  },
  {
   "name": "dataclasses.dataclass",
@@ -2260,7 +2260,7 @@
   "group": "dunder & classes",
   "ex": "from dataclasses import dataclass\n@dataclass\nclass P:\n    x: int\n    y: int = 0\nprint(P(1), P(1) == P(1))",
   "out": "P(x=1, y=0) True",
-  "lesson": "py-dataclasses"
+  "lesson": "py-classes"
  },
  {
   "name": "abc.ABC",
@@ -2269,7 +2269,7 @@
   "group": "dunder & classes",
   "ex": "from abc import ABC, abstractmethod\nclass S(ABC):\n    @abstractmethod\n    def area(self): ...\ntry:\n    S()\nexcept TypeError:\n    print(\"abstract\")",
   "out": "abstract",
-  "lesson": "py-abc"
+  "lesson": "py-inheritance"
  },
  {
   "name": "enum.Enum",
@@ -2278,7 +2278,7 @@
   "group": "dunder & classes",
   "ex": "from enum import Enum\nclass C(Enum):\n    RED = 1\n    BLUE = 2\nprint(C.RED.name, C(2))",
   "out": "RED C.BLUE",
-  "lesson": "py-dataclasses"
+  "lesson": "py-classes"
  },
  {
   "name": "contextlib.contextmanager",
@@ -2287,7 +2287,7 @@
   "group": "dunder & classes",
   "ex": "from contextlib import contextmanager\n@contextmanager\ndef box():\n    print(\"open\")\n    yield\n    print(\"close\")\nwith box():\n    print(\"inside\")",
   "out": "open\ninside\nclose",
-  "lesson": "py-context"
+  "lesson": "py-files"
  },
  {
   "name": "typing.Optional",
@@ -2296,7 +2296,7 @@
   "group": "dunder & classes",
   "ex": "from typing import Optional\ndef f(x: Optional[int] = None) -> int:\n    return x or 0\nprint(f(), f.__annotations__[\"x\"])",
   "out": "0 typing.Optional[int]",
-  "lesson": "py-typing"
+  "lesson": "py-functions"
  },
  {
   "name": "asyncio.run",
@@ -2305,7 +2305,7 @@
   "group": "dunder & classes",
   "ex": "import asyncio\nasync def hi():\n    await asyncio.sleep(0)\n    return \"done\"\nprint(asyncio.run(hi()))",
   "out": "done",
-  "lesson": "py-advanced"
+  "lesson": "py-functions"
  },
  {
   "name": "heapq.heappush",
@@ -2314,7 +2314,7 @@
   "group": "dunder & classes",
   "ex": "import heapq\nh = []\nfor n in [5, 1, 3]:\n    heapq.heappush(h, n)\nprint(heapq.heappop(h), heapq.heappop(h))",
   "out": "1 3",
-  "lesson": "py-datastructs"
+  "lesson": "py-lists"
  },
  {
   "name": "bisect.bisect_left",
@@ -2323,7 +2323,7 @@
   "group": "dunder & classes",
   "ex": "import bisect\nprint(bisect.bisect_left([1, 3, 5, 7], 5))",
   "out": "2",
-  "lesson": "py-search-sort"
+  "lesson": "py-lists"
  }
 ];
 })(typeof window !== 'undefined' ? window : globalThis);
