@@ -10,8 +10,10 @@ It is a **static site with no build step**: HTML, CSS and plain JavaScript.
 
 ```bash
 python3 -m http.server 8000     # or: npm start
-# open http://localhost:8000
+# then open http://localhost:8000 in your browser
 ```
+
+> The server prints `http://0.0.0.0:8000`. Don't click that: some browsers refuse `0.0.0.0`. Type **localhost:8000** (or `127.0.0.1:8000`) yourself. If the port is busy, use `python3 -m http.server 8080` and open `localhost:8080`.
 
 Any static host works (GitHub Pages: *Settings → Pages → Deploy from branch → `/ (root)`*). Progress is stored in your browser's `localStorage`; export or import a backup from the **Profile** page.
 
