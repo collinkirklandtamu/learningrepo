@@ -9,6 +9,7 @@
     const found = LP.findLesson(id);
     if (!found) { main.innerHTML = '<div class="wrap"><p>Lesson not found. <a href="#/">Back home</a></p></div>'; return; }
     const { course, lesson, next, prev } = found;
+    const parentLesson = lesson.drill ? course.lessons.find((l) => l.id === lesson.parent) : null;
     const store = LP.store;
     const kind = LP.kindOf(lesson, course);
     const S = { fails: 0, hints: 0, revealed: false, solved: false, wasDone: store.isDone(id), allPassedNotified: false };
@@ -18,9 +19,9 @@
     main.innerHTML = `<div class="lesson" data-tab="read" style="--course:${course.color}">
       <div class="lesson-tabs" role="tablist"><button type="button" role="tab" data-tab="read" aria-selected="true">📖 Read</button><button type="button" role="tab" data-tab="do" aria-selected="false">${kind === 'terminal' ? '⌨ Terminal' : '✍ Code'}</button></div>
       <section class="pane left" aria-label="Lesson">
-        <div class="crumbs"><a href="#/">Home</a> › <a href="#/course/${course.id}">${esc(course.title)}</a></div>
-        <h1 class="lesson-title">${esc(lesson.title)}</h1>
-        <div class="meta-row"><span class="pill">${esc(lesson.skill)}</span><span class="pill">+${lesson.xp || 20} XP</span><span class="pill">difficulty ${'●'.repeat(diff)}${'○'.repeat(3 - diff)}</span>${S.wasDone ? '<span class="pill" style="color:var(--ok)">✓ completed</span>' : ''}</div>
+        <div class="crumbs"><a href="#/">Home</a> › <a href="#/course/${course.id}">${esc(course.title)}</a>${parentLesson ? ` › <a href="#/lesson/${parentLesson.id}">${esc(parentLesson.title)}</a>` : ''}</div>
+        <h1 class="lesson-title">${lesson.drill ? 'Practice: ' : ''}${esc(lesson.title)}</h1>
+        <div class="meta-row">${lesson.drill ? '<span class="pill">🏋 Practice drill</span>' : ''}${lesson.capstone ? '<span class="pill">🏗 Capstone project</span>' : ''}<span class="pill">${esc(lesson.skill)}</span><span class="pill">+${lesson.xp || 20} XP</span><span class="pill">difficulty ${'●'.repeat(diff)}${'○'.repeat(3 - diff)}</span>${S.wasDone ? '<span class="pill" style="color:var(--ok)">✓ completed</span>' : ''}</div>
         <div class="md" id="reading">${LP.md(lesson.read)}</div>
         <div class="task-box"><h3>Your task</h3><div class="md">${LP.md(lesson.task)}</div></div>
         <div id="hintarea"></div><div id="solarea"></div>
@@ -140,6 +141,9 @@
           for (const m of lesson.must || []) {
             if (!new RegExp(m.re).test(code)) { showResult({ out: '', err: null }, `<div class="res bad"><b>Almost.</b> ${esc(m.msg)}</div>`); failed(); return; }
           }
+          for (const m of lesson.forbid || []) {
+            if (new RegExp(m.re).test(code)) { showResult({ out: '', err: null }, `<div class="res bad"><b>Almost.</b> ${esc(m.msg)}</div>`); failed(); return; }
+          }
           const r = await exec(true);
           if (!r) return;
           if (r.err) { showResult(r, '<div class="res bad"><b>Your code raised an error.</b> Fix it and submit again.</div>'); failed(); return; }
@@ -171,7 +175,7 @@
       const m = LP.modal(`<h2 style="text-align:center">Lesson complete! 🎉</h2><div class="bigstars">${LP.stars(out.stars)}</div><p class="muted" style="text-align:center;margin-top:0">${esc(why)}</p>
         <div class="reward"><div><span class="v">+${out.xp}</span><span class="k">XP</span></div><div><span class="v">+${out.sp}</span><span class="k">${esc(lesson.skill)} skill pts</span></div><div><span class="v">🔥 ${streak}</span><span class="k">day streak</span></div></div>
         ${out.levelUp ? `<div class="levelup">⬆ Level ${out.levelUp} reached!</div>` : ''}${out.skillUp ? `<div class="levelup">🛠 ${esc(course.title)} · ${esc(lesson.skill)} is now ${esc(out.skillUp)}!</div>` : ''}${badges}
-        <div class="row" style="justify-content:flex-end;margin-top:16px"><button type="button" class="btn ghost" data-x="skip">Skip</button><button type="button" class="btn primary" data-x="lock" autofocus>Lock it in: 1 quick question →</button></div>`, { sticky: true });
+        <div class="row" style="justify-content:flex-end;margin-top:16px">${(lesson.recall || [])[0] ? '<button type="button" class="btn ghost" data-x="skip">Skip</button><button type="button" class="btn primary" data-x="lock" autofocus>Lock it in: 1 quick question →</button>' : `<a class="btn" href="#/course/${course.id}" data-x="close">Course</a>${next ? `<a class="btn primary" href="#/lesson/${next.id}" data-x="close" autofocus>Next: ${esc(next.title)} →</a>` : ''}`}</div>`, { sticky: true });
       const q = (lesson.recall || [])[0];
       const finish = () => {
         const nav = next ? `<a class="btn primary" href="#/lesson/${next.id}" data-x="close">Next: ${esc(next.title)} →</a>` : `<a class="btn primary" href="#/course/${course.id}" data-x="close">Back to course</a>`;

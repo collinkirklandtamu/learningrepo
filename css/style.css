@@ -100,6 +100,13 @@ main { min-height: calc(100vh - 56px); }
 h2.section { font-size: 1.1rem; margin: 28px 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
 
 /* ---------- course page ---------- */
+.node-wrap { display: flex; flex-direction: column; gap: 6px; }
+.drills { display: flex; align-items: center; gap: 8px; padding: 0 10px 0 58px; font-size: 0.82rem; flex-wrap: wrap; }
+.dchip { width: 26px; height: 26px; border-radius: 8px; display: inline-grid; place-items: center; text-decoration: none; font-weight: 800; font-size: 0.78rem; background: var(--panel-2); border: 1px solid var(--line); color: var(--muted); }
+.dchip:hover { border-color: var(--course); color: var(--text); }
+.dchip.done { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.dchip.next { border-color: var(--course); color: var(--course); box-shadow: 0 0 0 2px color-mix(in srgb, var(--course) 25%, transparent); }
+.node.capstone { border-style: dashed; }
 .crumbs { color: var(--muted); font-size: 0.88rem; margin-bottom: 8px; }
 .crumbs a { text-decoration: none; }
 .crumbs a:hover { text-decoration: underline; }

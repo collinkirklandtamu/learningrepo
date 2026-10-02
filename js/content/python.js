@@ -427,7 +427,7 @@ else:
         ],
       },
       {
-        id: 'py-classes', title: 'Classes & objects', skill: 'OOP', xp: 45, diff: 3,
+        id: 'py-classes', title: 'Classes & objects', skill: 'OOP', xp: 45, diff: 3, arc: 'oop-python',
         read: `
 # Classes
 

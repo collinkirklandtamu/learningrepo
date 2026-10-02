@@ -41,6 +41,7 @@ for (const course of LP.courses.filter((c) => c.engine === 'python' || c.engine 
       assert.strictEqual(good.err, null, `solution errored: ${good.err}`);
       assert.ok(good.check && good.check.ok, `solution failed: ${good.check && good.check.msg}\n--- output:\n${good.out}`);
       for (const m of lesson.must || []) assert.ok(new RegExp(m.re).test(lesson.solution), `solution violates must: ${m.msg}`);
+      for (const m of lesson.forbid || []) assert.ok(!new RegExp(m.re).test(lesson.solution), `solution violates forbid: ${m.msg}`);
       const bad = run(lesson.starter, lesson.harness);
       assert.ok(bad.err || (bad.check && !bad.check.ok), 'starter code should not already pass');
     });

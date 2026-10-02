@@ -26,18 +26,30 @@
     { id: 'first', icon: '🚀', name: 'Liftoff', desc: 'Complete your first lesson', test: (s) => doneCount(s) >= 1 },
     { id: 'five', icon: '🔥', name: 'On a roll', desc: 'Complete 5 lessons', test: (s) => doneCount(s) >= 5 },
     { id: 'twenty', icon: '🏔️', name: 'Summit', desc: 'Complete 20 lessons', test: (s) => doneCount(s) >= 20 },
-    { id: 'perfect3', icon: '🎯', name: 'Sharpshooter', desc: '3 perfect lessons (first try, no hints)', test: (s) => Object.values(s.lessons).filter((l) => l.perfect).length >= 3 },
-    { id: 'perfect10', icon: '💎', name: 'Flawless', desc: '10 perfect lessons', test: (s) => Object.values(s.lessons).filter((l) => l.perfect).length >= 10 },
+    { id: 'perfect3', icon: '🎯', name: 'Sharpshooter', desc: '3 perfect lessons (first try, no hints)', test: (s) => Object.values(s.lessons).filter((l) => l.perfect && !l.drill).length >= 3 },
+    { id: 'perfect10', icon: '💎', name: 'Flawless', desc: '10 perfect lessons', test: (s) => Object.values(s.lessons).filter((l) => l.perfect && !l.drill).length >= 10 },
     { id: 'streak3', icon: '📅', name: 'Habit forming', desc: '3-day streak', test: (s) => s.streak.best >= 3 },
     { id: 'streak7', icon: '🗓️', name: 'Week warrior', desc: '7-day streak', test: (s) => s.streak.best >= 7 },
-    { id: 'poly', icon: '🌐', name: 'Polyglot', desc: 'Complete lessons in 3 different courses', test: (s) => new Set(Object.values(s.lessons).map((l) => l.course)).size >= 3 },
+    { id: 'poly', icon: '🌐', name: 'Polyglot', desc: 'Complete lessons in 3 different courses', test: (s) => new Set(Object.values(s.lessons).filter((l) => l.done).map((l) => l.course)).size >= 3 },
     { id: 'combo5', icon: '⚡', name: 'Combo x5', desc: 'Get 5 review answers right in a row', test: (s) => s.stats.bestCombo >= 5 },
     { id: 'review25', icon: '🧠', name: 'Memory palace', desc: 'Answer 25 review cards correctly', test: (s) => s.stats.reviewsCorrect >= 25 },
     { id: 'level5', icon: '⭐', name: 'Level 5', desc: 'Reach level 5', test: (s) => levelOf(s.xp) >= 5 },
     { id: 'level10', icon: '🌟', name: 'Level 10', desc: 'Reach level 10', test: (s) => levelOf(s.xp) >= 10 },
+    { id: 'drill25', icon: '🏋️', name: 'Reps', desc: 'Complete 25 practice drills', test: (s) => drillsDone(s) >= 25 },
+    { id: 'drill100', icon: '🦾', name: 'Iron discipline', desc: 'Complete 100 practice drills', test: (s) => drillsDone(s) >= 100 },
+    { id: 'capstone', icon: '🏗️', name: 'Builder', desc: 'Finish a capstone project', test: (s) => Object.values(s.lessons).some((l) => l.done && l.capstone) },
+    { id: 'capstone3', icon: '🏛️', name: 'Architect', desc: 'Finish three capstone projects', test: (s) => Object.values(s.lessons).filter((l) => l.done && l.capstone).length >= 3 },
+    { id: 'oop-py', icon: '🧬', name: 'Inheritance (Python)', desc: 'Finish the Python object-oriented arc', test: (s) => arcDone(s, 'oop-python') },
+    { id: 'oop-r', icon: '🧬', name: 'Inheritance (R)', desc: 'Finish the R S3 / S4 / Reference-class arc', test: (s) => arcDone(s, 'oop-r') },
     { id: 'master', icon: '👑', name: 'Skill master', desc: 'Master any skill', test: (s) => Object.values(s.skills).some((p) => p >= SKILL_LEVELS[4].at) },
   ];
-  const doneCount = (s) => Object.values(s.lessons).filter((l) => l.done).length;
+  const doneCount = (s) => Object.values(s.lessons).filter((l) => l.done && !l.drill).length;
+  const drillsDone = (s) => Object.values(s.lessons).filter((l) => l.done && l.drill).length;
+  // lessons tagged `arc: 'name'` form a learning arc; the badge needs every one of them
+  const arcDone = (s, arc) => {
+    const all = ((root.LP && root.LP.courses) || []).flatMap((c) => c.lessons).filter((l) => l.arc === arc);
+    return all.length > 0 && all.every((l) => s.lessons[l.id] && s.lessons[l.id].done);
+  };
   const levelOf = (xp) => Math.floor(Math.sqrt(xp / 40)) + 1;
   const xpForLevel = (l) => 40 * (l - 1) * (l - 1);
   const dayStr = (t) => { const d = new Date(t); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
@@ -125,7 +137,7 @@
 
       /* Award a finished lesson. info: {attempts (failed submits), hints, revealed} */
       completeLesson(lesson, course, info) {
-        const rec = state.lessons[lesson.id] || (state.lessons[lesson.id] = { course: course.id, done: false, fails: 0, hints: 0, xp: 0, runs: 0 });
+        const rec = state.lessons[lesson.id] || (state.lessons[lesson.id] = { course: course.id, done: false, fails: 0, hints: 0, xp: 0, runs: 0, drill: !!lesson.drill, capstone: !!lesson.capstone });
         const first = !rec.done;
         const fails = info.fails || 0, hints = info.hints || 0, revealed = !!info.revealed;
         const perfect = !revealed && fails === 0 && hints === 0;

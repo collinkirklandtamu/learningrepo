@@ -165,22 +165,31 @@ test('answer matching is forgiving about case, quotes and trailing periods', () 
   assert.ok(!LP.checkAnswer(q, 'git status'));
   assert.ok(LP.checkAnswer({ type: 'choice', answer: 2 }, 2));
 });
-test('every lesson has the fields the UI relies on', () => {
+test('every lesson has the fields the UI relies on, and drills/capstones are well-formed', () => {
   const ids = new Set();
   for (const c of LP.courses) {
     assert.ok(c.skills.length && c.color && c.icon);
+    const seen = new Set();
     for (const l of c.lessons) {
       assert.ok(!ids.has(l.id), 'duplicate id ' + l.id); ids.add(l.id);
       assert.ok(c.skills.includes(l.skill), `${l.id}: skill "${l.skill}" is not declared on the course`);
-      assert.ok(l.read && l.task && l.hints && l.hints.length >= 2, `${l.id}: needs reading, task and 2+ hints`);
-      assert.ok(l.recall && l.recall.length >= 1, `${l.id}: needs recall questions`);
-      for (const q of l.recall) {
+      assert.ok(l.read && l.task && l.hints && l.hints.length >= 1, `${l.id}: needs reading, task and a hint`);
+      if (l.drill) {
+        assert.ok(seen.has(l.parent), `${l.id}: parent ${l.parent} must come earlier in the same course`);
+        assert.ok(!c.lessons.find((x) => x.id === l.parent).drill, `${l.id}: drills attach to main lessons`);
+        assert.ok(l.xp <= 20, `${l.id}: drills are small`);
+      } else {
+        assert.ok(l.hints.length >= 2, `${l.id}: main lessons need 2+ hints`);
+        assert.ok(l.recall && l.recall.length >= 1, `${l.id}: needs recall questions`);
+      }
+      seen.add(l.id);
+      for (const q of l.recall || []) {
         if (q.type === 'choice') { assert.ok(q.options.length >= 3 && q.answer >= 0 && q.answer < q.options.length, `${l.id}: bad choice question`); }
         else { assert.ok(q.accept && q.accept.length, `${l.id}: type question needs accept[]`); }
         assert.ok(q.why, `${l.id}: every question explains its answer`);
       }
       const kind = LP.kindOf(l, c);
-      if (kind === 'code') assert.ok(l.harness && typeof l.solution === 'string' && l.starter !== undefined);
+      if (kind === 'code') assert.ok(l.harness && typeof l.solution === 'string' && l.starter !== undefined, `${l.id}: code lessons need harness/solution/starter`);
       else assert.ok(l.checks && l.checks.length && l.solution, `${l.id}: checks + solution required`);
     }
   }
