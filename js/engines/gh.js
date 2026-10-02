@@ -32,6 +32,34 @@
     return (m.remotes[key] = { key, owner, name, url: 'https://github.com/' + owner + '/' + name, branches: {}, defaultBranch: 'main', issues: [], prs: [], num: 1, forkOf: opts.forkOf || null, isPrivate: !!opts.isPrivate });
   }
 
+  M.prototype.addReview = function (url, number, review) {
+    const rem = G.findRemote(this, url);
+    const pr = rem.prs.find((x) => x.number === number);
+    (pr.reviews = pr.reviews || []).push(review);
+  };
+  M.prototype.protectBranch = function (url, branch, opts) { const rem = G.findRemote(this, url); rem.protect = rem.protect || {}; rem.protect[branch] = opts || { approvals: 1 }; };
+
+  function ghRelease(m, op, a, io, repo) {
+    const rem = originRemote(m, repo, io);
+    if (!rem) return 1;
+    rem.releases = rem.releases || [];
+    rem.tags = rem.tags || {};
+    if (op === 'create') {
+      const tag = a.find((x) => !x.startsWith('-'));
+      if (!tag) { io.err('tag argument required when not running interactively'); return 1; }
+      if (rem.releases.some((r) => r.tag === tag)) { io.err(`HTTP 422: a release with the tag ${tag} already exists`); return 1; }
+      const title = flag(a, '--title', '-t'), notes = flag(a, '--notes', '-n');
+      if (typeof title !== 'string' && typeof notes !== 'string' && !a.includes('--generate-notes')) { io.err('must provide `--title` and `--notes` (or `--generate-notes`) when not running interactively'); return 1; }
+      if (!rem.tags[tag]) rem.tags[tag] = rem.branches[rem.defaultBranch];
+      rem.releases.push({ tag, title: typeof title === 'string' ? title : tag, notes: typeof notes === 'string' ? notes : '' });
+      io.out(`${rem.url}/releases/tag/${tag}`);
+      return 0;
+    }
+    if (op === 'list') { if (!rem.releases.length) { io.err('no releases found'); return 0; } rem.releases.forEach((r) => io.out(`${r.title}\tLatest\t${r.tag}`)); return 0; }
+    io.err(`unknown command "${op}" for "gh release"`);
+    return 1;
+  }
+
   C.gh = function (m, a, io) {
     const [area, op, ...rest] = a;
     if (!area || area === '--help') { io.out('Work seamlessly with GitHub from the command line.\n\nCORE COMMANDS\n  auth, issue, pr, repo'); return 0; }
@@ -46,6 +74,7 @@
     if (!repo) { io.err('fatal: not a git repository (or any of the parent directories): .git'); return 128; }
     if (area === 'pr') return ghPr(m, op, rest, io, repo);
     if (area === 'issue') return ghIssue(m, op, rest, io, repo);
+    if (area === 'release') return ghRelease(m, op, rest, io, repo);
     io.err(`unknown command "${area}" for "gh"`);
     return 1;
   };
@@ -145,7 +174,7 @@
       if (!rem.branches[base]) { io.err(`base branch "${base}" does not exist`); return 1; }
       if (G.isAncestor(m, pushed, rem.branches[base])) { io.err(`pull request create failed: GraphQL: No commits between ${base} and ${head} (createPullRequest)`); return 1; }
       if (rem.prs.some((x) => x.head === head && x.base === base && x.state === 'OPEN')) { io.err(`a pull request for branch "${head}" into branch "${base}" already exists`); return 1; }
-      const pr = { number: rem.num++, title, body, head, base, state: 'OPEN', author: m.ghUser };
+      const pr = { number: rem.num++, title, body, head, base, state: 'OPEN', author: m.ghUser, reviews: [], comments: [] };
       rem.prs.push(pr);
       io.out(`\nCreating pull request for ${head} into ${base} in ${rem.owner}/${rem.name}\n\n${rem.url}/pull/${pr.number}`);
       return 0;
@@ -165,7 +194,26 @@
     if (op === 'view') {
       const pr = find();
       if (!pr) { io.err('no pull requests found for branch "' + repo.head.ref + '"'); return 1; }
-      io.out(`${pr.title} #${pr.number}\n${pr.state} • ${pr.author} wants to merge ${pr.head} into ${pr.base}\n\n${pr.body || 'No description provided'}\n\nView this pull request on GitHub: ${rem.url}/pull/${pr.number}`);
+      const rv = (pr.reviews || []).map((r) => `\n${r.author} ${r.state.toLowerCase().replace('_', ' ')}${r.body ? ': ' + r.body : ''}`).join('');
+      const cm = (pr.comments || []).map((c) => `\n${c.author} commented: ${c.body}`).join('');
+      io.out(`${pr.title} #${pr.number}\n${pr.state} • ${pr.author} wants to merge ${pr.head} into ${pr.base}\n\n${pr.body || 'No description provided'}${rv ? '\n\nReviews:' + rv : ''}${cm ? '\n\nComments:' + cm : ''}\n\nView this pull request on GitHub: ${rem.url}/pull/${pr.number}`);
+      return 0;
+    }
+    if (op === 'comment' || op === 'review') {
+      const pr = find();
+      if (!pr) { io.err(`no pull requests found for branch "${repo.head.ref}"`); return 1; }
+      const body = flag(a, '--body', '-b');
+      if (op === 'comment') {
+        if (typeof body !== 'string') { io.err('flag needs an argument: --body (-b)'); return 1; }
+        pr.comments.push({ author: m.ghUser, body });
+        io.out(`${rem.url}/pull/${pr.number}#issuecomment-1`);
+        return 0;
+      }
+      const kind = a.includes('--approve') || a.includes('-a') ? 'APPROVED' : a.includes('--request-changes') || a.includes('-r') ? 'CHANGES_REQUESTED' : a.includes('--comment') || a.includes('-c') ? 'COMMENTED' : null;
+      if (!kind) { io.err('--approve, --request-changes, or --comment required when not running interactively'); return 1; }
+      if (kind !== 'COMMENTED' && pr.author === m.ghUser) { io.err('failed to create review: GraphQL: Review Can not ' + (kind === 'APPROVED' ? 'approve' : 'request changes on') + ' your own pull request (addPullRequestReview)'); return 1; }
+      pr.reviews.push({ author: m.ghUser, state: kind, body: typeof body === 'string' ? body : '' });
+      io.out(`✓ ${kind === 'APPROVED' ? 'Approved' : kind === 'COMMENTED' ? 'Reviewed' : 'Requested changes on'} pull request #${pr.number}`);
       return 0;
     }
     if (op === 'close') {
@@ -185,6 +233,15 @@
       const pr = find();
       if (!pr) { io.err(`no pull requests found for branch "${repo.head.ref}"`); return 1; }
       if (pr.state !== 'OPEN') { io.err(`X Pull request #${pr.number} (${pr.title}) can't be merged because it was already ${pr.state.toLowerCase()}`); return 1; }
+      const prot = rem.protect && rem.protect[pr.base];
+      if (prot) {
+        const latest = {};
+        (pr.reviews || []).forEach((r) => { if (r.state !== 'COMMENTED') latest[r.author] = r.state; });
+        const approvals = Object.values(latest).filter((x) => x === 'APPROVED').length;
+        const blocked = Object.values(latest).includes('CHANGES_REQUESTED');
+        if (blocked) { io.err(`X Pull request #${pr.number} is not mergeable: changes were requested.\nTo have the pull request merged after the requested changes are addressed, get a new approval.`); return 1; }
+        if (approvals < (prot.approvals || 0)) { io.err(`X Pull request #${pr.number} is not mergeable: the base branch policy prohibits the merge.\n${prot.approvals} approving review${prot.approvals === 1 ? ' is' : 's are'} required (you have ${approvals}).`); return 1; }
+      }
       const baseId = rem.branches[pr.base], headId = rem.branches[pr.head];
       const squash = a.includes('--squash') || a.includes('-s'), rebase = a.includes('--rebase') || a.includes('-r');
       let newId;

@@ -201,41 +201,46 @@
         res.items.push({ t: 'err', text: 'bash: unexpected EOF while looking for matching quote' });
         res.code = 2; return res;
       }
-      if (toks.some((t) => t.t === 'op' && t.v === '|')) {
-        res.items.push({ t: 'err', text: 'The sandbox does not support pipes (|). Run each command on its own.' });
-        res.code = 1; return res;
-      }
       const groups = [[]];
       for (const t of toks) { if (t.t === 'op' && t.v === '&&') groups.push([]); else groups[groups.length - 1].push(t); }
       for (const g of groups) {
-        let redirect = null;
-        const argv = [];
-        for (let i = 0; i < g.length; i++) {
-          if (g[i].t === 'op') {
-            const target = g[i + 1];
-            if (!target || target.t !== 'word') { res.items.push({ t: 'err', text: 'bash: syntax error near unexpected token `newline\'' }); res.code = 2; return res; }
-            redirect = { mode: g[i].v, path: target.v }; i++;
-          } else argv.push(g[i].v);
+        // split into pipeline stages on |
+        const stages = [[]];
+        for (const t of g) { if (t.t === 'op' && t.v === '|') stages.push([]); else stages[stages.length - 1].push(t); }
+        let stdin = null, code = 0;
+        for (let si = 0; si < stages.length; si++) {
+          const st = stages[si];
+          let redirect = null;
+          const argv = [];
+          for (let i = 0; i < st.length; i++) {
+            if (st[i].t === 'op') {
+              const target = st[i + 1];
+              if (!target || target.t !== 'word') { res.items.push({ t: 'err', text: 'bash: syntax error near unexpected token `newline\'' }); res.code = 2; return res; }
+              redirect = { mode: st[i].v, path: target.v }; i++;
+            } else argv.push(st[i].v);
+          }
+          if (!argv.length) { if (stages.length > 1) { res.items.push({ t: 'err', text: 'bash: syntax error near unexpected token `|\'' }); res.code = 2; return res; } continue; }
+          const io = { stdin, chunks: [], out: (x) => io.chunks.push({ t: 'out', text: String(x) }), err: (x) => io.chunks.push({ t: 'err', text: String(x) }) };
+          const handler = Machine.commands[argv[0]];
+          if (!handler) { io.err(`bash: ${argv[0]}: command not found`); code = 127; }
+          else {
+            try { code = handler(this, argv.slice(1), io, res) || 0; }
+            catch (e) { if (typeof console !== 'undefined' && root.LP_DEBUG) console.error(e); io.err('internal sandbox error: ' + e.message); code = 1; }
+          }
+          let chunks = io.chunks;
+          if (redirect) {
+            const target = this.abs(redirect.path);
+            const text = chunks.filter((c) => c.t === 'out').map((c) => c.text + '\n').join('');
+            chunks = chunks.filter((c) => c.t === 'err');
+            if (this.isDir(target)) { chunks.push({ t: 'err', text: `bash: ${redirect.path}: Is a directory` }); code = 1; }
+            else this.write(target, (redirect.mode === '>>' ? this.read(target) || '' : '') + text);
+          }
+          this.cmds.push({ line: argv.join(' '), argv, ok: code === 0 });
+          if (si < stages.length - 1) {
+            stdin = chunks.filter((c) => c.t === 'out').map((c) => c.text).join('\n');
+            res.items.push(...chunks.filter((c) => c.t === 'err'));
+          } else res.items.push(...chunks);
         }
-        if (!argv.length) continue;
-        const io = { chunks: [], out: (s) => io.chunks.push({ t: 'out', text: String(s) }), err: (s) => io.chunks.push({ t: 'err', text: String(s) }) };
-        const handler = Machine.commands[argv[0]];
-        let code;
-        if (!handler) { io.err(`bash: ${argv[0]}: command not found`); code = 127; }
-        else {
-          try { code = handler(this, argv.slice(1), io, res) || 0; }
-          catch (e) { if (typeof console !== 'undefined' && root.LP_DEBUG) console.error(e); io.err('internal sandbox error: ' + e.message); code = 1; }
-        }
-        let chunks = io.chunks;
-        if (redirect) {
-          const target = this.abs(redirect.path);
-          const text = chunks.filter((c) => c.t === 'out').map((c) => c.text + '\n').join('');
-          chunks = chunks.filter((c) => c.t === 'err');
-          if (this.isDir(target)) { chunks.push({ t: 'err', text: `bash: ${redirect.path}: Is a directory` }); code = 1; }
-          else this.write(target, (redirect.mode === '>>' ? this.read(target) || '' : '') + text);
-        }
-        this.cmds.push({ line: argv.join(' '), argv, ok: code === 0 });
-        res.items.push(...chunks);
         res.code = code;
         if (code !== 0) break;
       }
@@ -385,9 +390,37 @@
     if (!r) { io.err(`curl: (7) Failed to connect to ${url.replace(/^https?:\/\//, '')} Couldn't connect to server`); return 7; }
     io.out(r);
   };
+  // ---- text filters (work with files or piped stdin)
+  const inputLines = (m, a, io, files) => {
+    if (files.length) {
+      const out = [];
+      for (const f of files) { const v = m.read(f); if (v === null) { io.err(`${C._name || 'cmd'}: ${f}: No such file or directory`); return null; } out.push(...splitLines(v)); }
+      return out;
+    }
+    return io.stdin == null ? [] : io.stdin.split('\n').filter((l, i, arr) => !(i === arr.length - 1 && l === ''));
+  };
+  C.grep = (m, a, io) => {
+    const flags = a.filter((x) => /^-[a-zA-Z]+$/.test(x)).join('');
+    const rest = a.filter((x) => !/^-[a-zA-Z]+$/.test(x));
+    if (!rest.length) { io.err('Usage: grep [OPTION]... PATTERNS [FILE]...'); return 2; }
+    let re;
+    try { re = new RegExp(rest[0], flags.includes('i') ? 'i' : ''); } catch (e) { io.err('grep: Invalid regular expression'); return 2; }
+    const lines = inputLines(m, a, io, rest.slice(1));
+    if (lines === null) return 2;
+    const hit = lines.map((l, i) => [l, i + 1]).filter(([l]) => re.test(l) !== flags.includes('v'));
+    if (flags.includes('c')) { io.out(String(hit.length)); return hit.length ? 0 : 1; }
+    hit.forEach(([l, n]) => io.out((flags.includes('n') ? n + ':' : '') + l));
+    return hit.length ? 0 : 1;
+  };
+  const nArg = (a) => { const i = a.indexOf('-n'); if (i >= 0) return [parseInt(a[i + 1], 10), a.filter((x, j) => j !== i && j !== i + 1)]; const d = a.find((x) => /^-\d+$/.test(x)); return d ? [-parseInt(d, 10), a.filter((x) => x !== d)] : [10, a]; };
+  C.head = (m, a, io) => { const [n, rest] = nArg(a); const l = inputLines(m, a, io, rest.filter((x) => !x.startsWith('-'))); if (l === null) return 1; l.slice(0, n).forEach((x) => io.out(x)); };
+  C.tail = (m, a, io) => { const [n, rest] = nArg(a); const l = inputLines(m, a, io, rest.filter((x) => !x.startsWith('-'))); if (l === null) return 1; l.slice(-n).forEach((x) => io.out(x)); };
+  C.wc = (m, a, io) => { const l = inputLines(m, a, io, a.filter((x) => !x.startsWith('-'))); if (l === null) return 1; io.out(a.includes('-l') ? String(l.length) : `${l.length} ${l.join(' ').split(/\s+/).filter(Boolean).length} ${l.join('\n').length}`); };
+  C.sort = (m, a, io) => { const l = inputLines(m, a, io, a.filter((x) => !x.startsWith('-'))); if (l === null) return 1; l.sort(); if (a.includes('-r')) l.reverse(); l.forEach((x) => io.out(x)); };
+  C.uniq = (m, a, io) => { const l = inputLines(m, a, io, a.filter((x) => !x.startsWith('-'))); if (l === null) return 1; l.filter((x, i) => i === 0 || x !== l[i - 1]).forEach((x) => io.out(x)); };
   C.exit = (m, a, io) => io.out('(This is a sandbox - there is nothing to exit. Keep going!)');
 
   LP.Machine = Machine;
-  LP.util = { sha, splitLines, joinLines, plural, diffOps, merge3, tokenize, dirname, basename };
+  LP.util = { sha, splitLines, joinLines, plural, diffOps, lcsMap, merge3, tokenize, dirname, basename };
   if (typeof module !== 'undefined') module.exports = LP;
 })(typeof window !== 'undefined' ? window : globalThis);

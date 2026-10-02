@@ -355,7 +355,7 @@ Containers are named \`<folder>-<service>-1\`, so in a folder called \`stack\` y
           { label: 'Container stack-web-1 is running', test: (m) => { const c = m.container('stack-web-1'); return !!c && c.status === 'running'; } },
           { label: 'Container stack-db-1 is running', test: (m) => { const c = m.container('stack-db-1'); return !!c && c.status === 'running'; } },
           { label: 'web publishes port 8080 -> 80', test: (m) => { const c = m.container('stack-web-1'); return !!c && c.ports.some((p) => p.host === 8080 && p.container === 80); } },
-          { label: 'db has POSTGRES_PASSWORD and the pgdata volume', test: (m) => { const c = m.container('stack-db-1'); return !!c && !!c.env.POSTGRES_PASSWORD && c.volumes.some((v) => v.startsWith('pgdata:')); } },
+          { label: 'db has POSTGRES_PASSWORD and the pgdata volume', test: (m) => { const c = m.container('stack-db-1'); return !!c && !!c.env.POSTGRES_PASSWORD && c.volumes.some((v) => /pgdata:\/var\/lib\/postgresql\/data/.test(v)); } },
           { label: 'Checked status with docker compose ps', test: (m) => m.ran(/^docker compose ps/) },
           { label: 'Fetched the page with curl localhost:8080', test: (m) => m.ran(/^curl .*:8080/) },
         ],

@@ -3,7 +3,7 @@
 (function (root) {
   'use strict';
   const LP = root.LP || (typeof require !== 'undefined' ? require('./shell.js') : null);
-  const { sha, splitLines, joinLines, plural, diffOps, merge3, dirname, basename } = LP.util;
+  const { sha, splitLines, joinLines, plural, diffOps, lcsMap, merge3, dirname, basename } = LP.util;
   const M = LP.Machine;
   const C = M.commands;
   const short = (id) => id.slice(0, 7);
@@ -21,7 +21,7 @@
   function newRepo(m, rootDir, branch) {
     const repo = {
       root: rootDir, branches: {}, head: { ref: branch || 'main' }, index: new Map(), config: {},
-      remotes: {}, remoteRefs: {}, upstream: {}, tags: {}, stash: [], merging: null, unmerged: new Set(),
+      remotes: {}, remoteRefs: {}, upstream: {}, tags: {}, tagMeta: {}, reflog: [], stash: [], merging: null, unmerged: new Set(), bisect: null,
     };
     m.repos[rootDir] = repo;
     m.mkdirp(rootDir + '/.git');
@@ -29,7 +29,8 @@
   }
   const treeOf = (m, id) => (id ? m.objects.get(id).tree : {});
   const headId = (repo) => (repo.head.ref ? repo.branches[repo.head.ref] || null : repo.head.id);
-  function setHead(repo, id) { if (repo.head.ref) repo.branches[repo.head.ref] = id; else repo.head.id = id; }
+  function logHead(repo, note) { const id = headId(repo); if (id) repo.reflog.unshift({ id, note: note || repo._act || 'update' }); }
+  function setHead(repo, id, note) { if (repo.head.ref) repo.branches[repo.head.ref] = id; else repo.head.id = id; logHead(repo, note); }
   function ancestors(m, id) {
     const seen = new Set(), stack = id ? [id] : [];
     while (stack.length) {
@@ -265,7 +266,7 @@
       io.out(`Updating ${short(cur)}..${short(targetId)}\nFast-forward`);
       io.out(statLines(statOf(curTree, tgtTree)).join('\n'));
       applyTree(m, repo, tgtTree, curTree);
-      setHead(repo, targetId);
+      setHead(repo, targetId, `merge ${o.label}: Fast-forward`);
       return 'ff';
     }
     const baseId = mergeBase(m, cur, targetId);
@@ -281,7 +282,7 @@
     }
     const author = identity(m, repo) || { name: 'Learner', email: 'learner@example.com' };
     const id = newCommit(m, o.message, [cur, targetId], res.tree, author);
-    setHead(repo, id);
+    setHead(repo, id, `merge ${o.label}: Merge made by the 'ort' strategy.`);
     io.out(`Merge made by the 'ort' strategy.`);
     io.out(statLines(statOf(curTree, res.tree)).join('\n'));
     return 'merged';
@@ -438,8 +439,10 @@
     }
     if (repo.head.ref === name && isBranch) { io.out(`Already on '${name}'`); return 0; }
     if (!guardOverwrite(m, repo, treeOf(m, id), io, 'checkout')) return 1;
+    const fromName = repo.head.ref || short(repo.head.id);
     applyTree(m, repo, treeOf(m, id), treeOf(m, headId(repo)));
     repo.head = newHead;
+    logHead(repo, `checkout: moving from ${fromName} to ${name}`);
     if (newHead.ref) io.out(`Switched to branch '${name}'`);
     else io.out(`Note: switching to '${name}'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.`);
     return 0;
@@ -531,11 +534,11 @@
       msg = msg || old.msg;
       prevTree = treeOf(m, parents[0]);
     }
-    if (repo.merging) { parents = [headId(repo), repo.merging.id]; msg = msg || repo.merging.msg; }
+    if (repo.merging) { parents = repo.merging.cherry ? [headId(repo)] : [headId(repo), repo.merging.id]; msg = msg || repo.merging.msg; }
     if (!msg) { io.err('Aborting commit due to empty commit message.'); return 1; }
     const cid = newCommit(m, msg, parents, tree, id);
     const wasRoot = !headId(repo);
-    setHead(repo, cid);
+    setHead(repo, cid, `commit${wasRoot ? ' (initial)' : o.amend ? ' (amend)' : repo.merging && !repo.merging.cherry ? ' (merge)' : ''}: ${msg.split('\n')[0]}`);
     repo.merging = null;
     const st = statOf(prevTree, tree);
     io.out(`[${repo.head.ref || 'detached HEAD'}${wasRoot ? ' (root-commit)' : ''} ${short(cid)}] ${msg.split('\n')[0]}`);
@@ -556,6 +559,7 @@
       }
     }
     for (const key of Object.keys(repo.remoteRefs)) if (key.startsWith(name + '/') && !(key.slice(name.length + 1) in rem.branches)) delete repo.remoteRefs[key];
+    for (const [t, id] of Object.entries(rem.tags || {})) if (!repo.tags[t]) { repo.tags[t] = id; updates.push(` * [new tag]         ${t.padEnd(10)} -> ${t}`); }
     if (updates.length && !quiet) io.out(`From ${url.replace(/\.git$/, '')}\n${updates.join('\n')}`);
     return rem;
   }
@@ -613,6 +617,7 @@
     if (!repo) { io.err(NOT_REPO); return 128; }
     const handler = SUB[sub];
     if (!handler) { io.err(`git: '${sub}' is not a git command. See 'git --help'.`); return 1; }
+    repo._act = sub + (rest.length ? ': ' + rest.join(' ') : '');
     return handler(m, repo, rest, io) || 0;
   };
 
@@ -691,6 +696,8 @@
   SUB.show = (m, repo, a, io) => {
     const ref = a.find((x) => !x.startsWith('-')) || 'HEAD';
     const id = resolveRef(m, repo, ref);
+    const tm = repo.tagMeta[ref];
+    if (tm && id) io.out(`tag ${ref}\nTagger: ${tm.tagger.name} <${tm.tagger.email}>\nDate:   ${fmtDate(tm.time)}\n\n${tm.msg}\n`);
     if (!id) { io.err(`fatal: ambiguous argument '${ref}': unknown revision or path not in the working tree.`); return 128; }
     const c = m.objects.get(id);
     const lines = [`commit ${id}`, `Author: ${c.author.name} <${c.author.email}>`, `Date:   ${fmtDate(c.time)}`, '', ...c.msg.split('\n').map((l) => '    ' + l), ''];
@@ -702,15 +709,37 @@
     if (!start) { io.err(`fatal: your current branch '${repo.head.ref}' does not have any commits yet`); return 128; }
     const oneline = a.includes('--oneline') || a.some((x) => x.startsWith('--pretty=oneline') || x === '--format=oneline');
     const graph = a.includes('--graph');
+    const patch = a.includes('-p') || a.includes('--patch');
+    const stat = a.includes('--stat');
     let limit = Infinity;
     const ni = a.findIndex((x) => /^-n$/.test(x));
     if (ni >= 0) limit = parseInt(a[ni + 1], 10);
     for (const x of a) if (/^-\d+$/.test(x)) limit = -parseInt(x, 10);
-    const target = a.find((x) => !x.startsWith('-') && resolveRef(m, repo, x));
-    const from = target ? resolveRef(m, repo, target) : start;
-    const all = a.includes('--all');
-    let ids = all ? Object.values(repo.branches).flatMap((b) => [...ancestors(m, b)]) : [...ancestors(m, from)];
-    ids = [...new Set(ids)].map((x) => m.objects.get(x)).sort((x, y) => y.time - x.time).slice(0, limit);
+    const opt = (n) => { const x = a.find((y) => y.startsWith(n + '=')); return x ? x.slice(n.length + 1) : null; };
+    const author = opt('--author'), grep = opt('--grep');
+    const dd = a.indexOf('--');
+    const pathArgs = dd >= 0 ? a.slice(dd + 1) : a.filter((x) => !x.startsWith('-') && !resolveRef(m, repo, x) && !x.includes('..') && m.exists(m.abs(x)));
+    const rels = pathArgs.map((x) => m.abs(x).slice(repo.root.length + 1));
+    const revArgs = a.filter((x, i) => !x.startsWith('-') && !pathArgs.includes(x) && !(ni >= 0 && i === ni + 1) && (dd < 0 || i < dd));
+    let set;
+    const range = revArgs.find((x) => x.includes('..'));
+    if (range) {
+      const [lo, hi] = range.split('..');
+      const l = resolveRef(m, repo, lo || 'HEAD'), h = resolveRef(m, repo, hi || 'HEAD');
+      if (!l || !h) { io.err(`fatal: ambiguous argument '${range}': unknown revision or path not in the working tree.`); return 128; }
+      const have = ancestors(m, l);
+      set = [...ancestors(m, h)].filter((x) => !have.has(x));
+    } else {
+      const target = revArgs.find((x) => resolveRef(m, repo, x));
+      const from = target ? resolveRef(m, repo, target) : start;
+      set = a.includes('--all') ? Object.values(repo.branches).flatMap((b) => [...ancestors(m, b)]) : [...ancestors(m, from)];
+    }
+    let ids = [...new Set(set)].map((x) => m.objects.get(x)).sort((x, y) => y.time - x.time);
+    if (author) ids = ids.filter((c) => c.author.name.includes(author) || c.author.email.includes(author));
+    if (grep) ids = ids.filter((c) => c.msg.includes(grep));
+    if (rels.length) ids = ids.filter((c) => rels.some((r) => (c.tree[r]) !== ((c.parents.length ? m.objects.get(c.parents[0]).tree : {})[r])));
+    if (a.includes('--reverse')) ids.reverse();
+    ids = ids.slice(0, limit);
     const deco = decorations(m, repo);
     const lines = [];
     for (const c of ids) {
@@ -720,6 +749,9 @@
         lines.push(`commit ${c.id}${d}`);
         if (c.parents.length > 1) lines.push(`Merge: ${c.parents.map(short).join(' ')}`);
         lines.push(`Author: ${c.author.name} <${c.author.email}>`, `Date:   ${fmtDate(c.time)}`, '', ...c.msg.split('\n').map((l) => '    ' + l), '');
+        const pt = c.parents.length ? m.objects.get(c.parents[0]).tree : {};
+        if (stat) lines.push(...statLines(statOf(pt, c.tree)), '');
+        if (patch) lines.push(...treeDiff(pt, c.tree, rels.length ? (p) => rels.includes(p) : null), '');
       }
     }
     io.out(lines.join('\n').replace(/\n+$/, ''));
@@ -768,7 +800,9 @@
       const start = a[ci + 2] ? resolveRef(m, repo, a[ci + 2]) : headId(repo);
       const code = createBranch(m, repo, io, name, start);
       if (code) return code;
+      const fromName = repo.head.ref || short(repo.head.id);
       repo.head = { ref: name };
+      logHead(repo, `checkout: moving from ${fromName} to ${name}`);
       io.out(`Switched to a new branch '${name}'`);
       return 0;
     }
@@ -786,7 +820,9 @@
       if (a[bi] === '-B' && repo.branches[name]) delete repo.branches[name];
       const code = createBranch(m, repo, io, name, start);
       if (code) return code;
+      const fromName = repo.head.ref || short(repo.head.id);
       repo.head = { ref: name };
+      logHead(repo, `checkout: moving from ${fromName} to ${name}`);
       io.out(`Switched to a new branch '${name}'`);
       return 0;
     }
@@ -809,16 +845,17 @@
     if (!paths.length) { io.err('fatal: you must specify path(s) to restore'); return 128; }
     return restorePaths(m, repo, io, paths, { staged, source });
   };
+  const abortMerge = (m, repo, io) => {
+    if (!repo.merging) { io.err('fatal: There is no merge to abort (MERGE_HEAD missing).'); return 128; }
+    const t = treeOf(m, headId(repo));
+    const wt = worktree(m, repo);
+    for (const p of wt.keys()) if (!(p in t) && repo.index.has(p)) m.files.delete(repo.root + '/' + p);
+    applyTree(m, repo, t, t);
+    repo.merging = null; repo.unmerged = new Set();
+    return 0;
+  };
   SUB.merge = (m, repo, a, io) => {
-    if (a.includes('--abort')) {
-      if (!repo.merging) { io.err('fatal: There is no merge to abort (MERGE_HEAD missing).'); return 128; }
-      const t = treeOf(m, headId(repo));
-      const wt = worktree(m, repo);
-      for (const p of wt.keys()) if (!(p in t) && repo.index.has(p)) m.files.delete(repo.root + '/' + p);
-      applyTree(m, repo, t, t);
-      repo.merging = null; repo.unmerged = new Set();
-      return 0;
-    }
+    if (a.includes('--abort')) return abortMerge(m, repo, io);
     if (a.includes('--continue')) return doCommit(m, repo, io, null, {});
     if (repo.merging) { io.err('error: Merging is not possible because you have unmerged files.\nhint: Fix them up in the work tree, and then use \'git add/rm <file>\'\nhint: as appropriate to mark resolution and make a commit.\nfatal: Exiting because of an unresolved conflict.'); return 128; }
     const name = a.find((x, i) => !x.startsWith('-') && a[i - 1] !== '-m');
@@ -849,7 +886,7 @@
     const id = refName ? resolveRef(m, repo, refName) : headId(repo);
     if (!id) { io.err(`fatal: ambiguous argument '${args[0]}': unknown revision or path not in the working tree.`); return 128; }
     const oldTree = treeOf(m, headId(repo));
-    setHead(repo, id);
+    setHead(repo, id, `reset: moving to ${refName || 'HEAD'}`);
     if (mode !== 'soft') repo.index = new Map(Object.entries(treeOf(m, id)));
     if (mode === 'hard') {
       applyTree(m, repo, treeOf(m, id), oldTree);
@@ -871,12 +908,24 @@
     return doCommit(m, repo, io, `Revert "${c.msg.split('\n')[0]}"\n\nThis reverts commit ${id}.`, {});
   };
   SUB.tag = (m, repo, a, io) => {
-    if (a.includes('-d')) { const t = a[a.indexOf('-d') + 1]; if (!repo.tags[t]) { io.err(`error: tag '${t}' not found.`); return 1; } delete repo.tags[t]; io.out(`Deleted tag '${t}'`); return 0; }
+    if (a.includes('-d')) { const t = a[a.indexOf('-d') + 1]; if (!repo.tags[t]) { io.err(`error: tag '${t}' not found.`); return 1; } delete repo.tags[t]; delete repo.tagMeta[t]; io.out(`Deleted tag '${t}'`); return 0; }
+    const mi = a.findIndex((x) => x === '-m');
+    const annotated = a.includes('-a') || mi >= 0;
     const p = a.filter((x, i) => !x.startsWith('-') && a[i - 1] !== '-m');
-    if (!p.length) { Object.keys(repo.tags).sort().forEach((t) => io.out(t)); return 0; }
+    const listing = a.includes('-l') || a.includes('--list') || !p.length || (a.includes('-n') && !annotated);
+    if (listing) {
+      const pat = p[0] ? new RegExp('^' + p[0].split('*').map(esc).join('.*') + '$') : null;
+      Object.keys(repo.tags).sort().filter((t) => !pat || pat.test(t)).forEach((t) => io.out(a.some((x) => /^-n/.test(x)) ? `${t.padEnd(15)}${(repo.tagMeta[t] && repo.tagMeta[t].msg) || m.objects.get(repo.tags[t]).msg.split('\n')[0]}` : t));
+      return 0;
+    }
     if (repo.tags[p[0]]) { io.err(`fatal: tag '${p[0]}' already exists`); return 128; }
     const id = p[1] ? resolveRef(m, repo, p[1]) : headId(repo);
     if (!id) { io.err('fatal: Failed to resolve \'HEAD\' as a valid ref.'); return 128; }
+    if (annotated) {
+      if (mi < 0) { io.err('fatal: no tag message? (the sandbox has no editor: use git tag -a <name> -m "message")'); return 128; }
+      const who = identity(m, repo) || { name: 'Learner', email: 'learner@example.com' };
+      repo.tagMeta[p[0]] = { msg: a[mi + 1], tagger: who, time: m.tick() };
+    }
     repo.tags[p[0]] = id;
   };
   SUB.stash = (m, repo, a, io) => {
@@ -925,8 +974,140 @@
       tipTree = res.tree;
     }
     applyTree(m, repo, tipTree, treeOf(m, cur));
-    setHead(repo, tip);
+    setHead(repo, tip, `rebase (finish): ${repo.head.ref} onto ${short(up)}`);
     io.out(`Successfully rebased and updated refs/heads/${repo.head.ref}.`);
+  };
+
+  SUB['cherry-pick'] = (m, repo, a, io) => {
+    if (a.includes('--abort')) return abortMerge(m, repo, io);
+    if (a.includes('--continue')) return doCommit(m, repo, io, null, {});
+    const refs = a.filter((x) => !x.startsWith('-'));
+    if (!refs.length) { io.err('error: you must specify a commit to cherry-pick'); return 128; }
+    if (repo.merging) { io.err('error: cherry-picking is not possible because you have unmerged files.'); return 128; }
+    if (dirtyPaths(m, repo).size) { io.err('error: your local changes would be overwritten by cherry-pick.\nhint: commit your changes or stash them to proceed.\nfatal: cherry-pick failed'); return 128; }
+    for (const ref of refs) {
+      const id = resolveRef(m, repo, ref);
+      if (!id) { io.err(`fatal: bad revision '${ref}'`); return 128; }
+      const c = m.objects.get(id);
+      if (!c.parents.length) { io.err('error: cherry-picking a root commit is not supported in the sandbox'); return 128; }
+      const cur = headId(repo), curTree = treeOf(m, cur);
+      const res = mergeTrees(treeOf(m, c.parents[0]), curTree, c.tree, 'HEAD', `${short(id)} (${c.msg.split('\n')[0]})`);
+      if (res.conflicts.length) {
+        applyTree(m, repo, res.tree, curTree);
+        repo.unmerged = new Set(res.conflicts);
+        repo.merging = { id, msg: c.msg, cherry: true };
+        io.err(`error: could not apply ${short(id)}... ${c.msg.split('\n')[0]}\nhint: After resolving the conflicts, mark them with "git add <file>"\nhint: and run "git cherry-pick --continue".\nhint: Or abort with "git cherry-pick --abort".\n${res.notes.join('\n')}`);
+        return 1;
+      }
+      const same = JSON.stringify(Object.entries(res.tree).sort()) === JSON.stringify(Object.entries(curTree).sort());
+      if (same) { io.err('The previous cherry-pick is now empty, possibly due to conflict resolution.'); return 1; }
+      applyTree(m, repo, res.tree, curTree);
+      const nid = newCommit(m, c.msg, [cur], res.tree, c.author);
+      setHead(repo, nid, `cherry-pick: ${c.msg.split('\n')[0]}`);
+      io.out(`[${repo.head.ref || 'detached HEAD'} ${short(nid)}] ${c.msg.split('\n')[0]}\n${statLines(statOf(curTree, res.tree), true).join('\n')}`);
+    }
+    return 0;
+  };
+  SUB.reflog = (m, repo, a, io) => {
+    if (!repo.reflog.length) { io.out(''); return 0; }
+    repo.reflog.forEach((e, i) => io.out(`${short(e.id)} HEAD@{${i}}: ${e.note}`));
+  };
+  SUB.bisect = (m, repo, a, io) => {
+    const op = a[0];
+    if (op === 'start') {
+      if (!headId(repo)) { io.err('fatal: no commits yet'); return 128; }
+      repo.bisect = { orig: Object.assign({}, repo.head), origId: headId(repo), good: null, bad: null };
+      io.out('status: waiting for both good and bad commits');
+      return 0;
+    }
+    const b = repo.bisect;
+    if (!b) { io.err('You need to start by "git bisect start"'); return 1; }
+    if (op === 'reset') {
+      const cur = treeOf(m, headId(repo));
+      applyTree(m, repo, treeOf(m, b.origId), cur);
+      repo.head = b.orig; repo.bisect = null;
+      io.out(`Previous HEAD position was ${short(headId(repo) || b.origId)}\n${b.orig.ref ? `Switched to branch '${b.orig.ref}'` : 'HEAD is now at ' + short(b.origId)}`);
+      return 0;
+    }
+    if (op === 'log') { io.out(`# bad: ${b.bad || 'none'}\n# good: ${b.good || 'none'}`); return 0; }
+    if (!['good', 'bad', 'new', 'old'].includes(op)) { io.err(`error: unknown bisect command '${op}'`); return 1; }
+    const isGood = op === 'good' || op === 'old';
+    const id = a[1] ? resolveRef(m, repo, a[1]) : headId(repo);
+    if (!id) { io.err(`error: Bad rev input: ${a[1]}`); return 1; }
+    if (isGood) b.good = id; else b.bad = id;
+    if (!b.good || !b.bad) { io.out(`status: waiting for ${!b.good ? 'a good' : 'a bad'} commit`); return 0; }
+    if (!isAncestor(m, b.good, b.bad)) { io.err('The good commit must be an ancestor of the bad commit.'); return 1; }
+    const chain = [];
+    for (let x = b.bad; x && x !== b.good;) { chain.push(x); x = m.objects.get(x).parents[0]; }
+    const unknown = chain.slice(1);
+    if (!unknown.length) {
+      const c = m.objects.get(b.bad);
+      io.out(`${b.bad} is the first bad commit\ncommit ${b.bad}\nAuthor: ${c.author.name} <${c.author.email}>\nDate:   ${fmtDate(c.time)}\n\n    ${c.msg.split('\n')[0]}`);
+      return 0;
+    }
+    const mid = unknown[Math.floor(unknown.length / 2)];
+    const cur = treeOf(m, headId(repo));
+    if (!guardOverwrite(m, repo, treeOf(m, mid), io, 'checkout')) return 1;
+    applyTree(m, repo, treeOf(m, mid), cur);
+    repo.head = { id: mid };
+    logHead(repo, `checkout: moving to ${short(mid)}`);
+    const left = unknown.length - 1;
+    io.out(`Bisecting: ${plural(left, 'revision')} left to test after this (roughly ${Math.max(1, Math.ceil(Math.log2(unknown.length + 1)))} step${unknown.length > 1 ? 's' : ''})\n[${mid}] ${m.objects.get(mid).msg.split('\n')[0]}`);
+    return 0;
+  };
+  SUB.blame = (m, repo, a, io) => {
+    const f = a.find((x) => !x.startsWith('-'));
+    const rel = f && m.abs(f).slice(repo.root.length + 1);
+    const head = headId(repo);
+    if (!f || !head || !(rel in treeOf(m, head))) { io.err(`fatal: no such path '${f || ''}' in HEAD`); return 128; }
+    const lines = splitLines(treeOf(m, head)[rel]);
+    const owner = new Array(lines.length).fill(null);
+    let track = lines.map((_, i) => i);          // line index in the version of the commit we are looking at
+    let cid = head;
+    let cur = lines;
+    while (cid && track.some((t, i) => owner[i] === null && t >= 0)) {
+      const c = m.objects.get(cid);
+      const pv = c.parents.length ? splitLines((treeOf(m, c.parents[0]))[rel] || '') : [];
+      const map = lcsMap(pv, cur);                // parent idx -> child idx
+      const back = new Array(cur.length).fill(-1);
+      map.forEach((ci, pi) => { if (ci >= 0) back[ci] = pi; });
+      track = track.map((t, i) => {
+        if (owner[i] !== null || t < 0) return t;
+        if (back[t] < 0) { owner[i] = cid; return -1; }
+        return back[t];
+      });
+      cur = pv; cid = c.parents[0];
+    }
+    const w = Math.max(...lines.map((_, i) => String(i + 1).length));
+    lines.forEach((l, i) => {
+      const c = m.objects.get(owner[i] || head);
+      const d = new Date(c.time * 1000).toISOString().slice(0, 10);
+      io.out(`${short(c.id)} (${c.author.name.padEnd(8)} ${d} ${String(i + 1).padStart(w)}) ${l}`);
+    });
+  };
+  SUB.shortlog = (m, repo, a, io) => {
+    const counts = {};
+    const by = {};
+    [...ancestors(m, headId(repo))].map((x) => m.objects.get(x)).sort((x, y) => y.time - x.time).forEach((c) => { counts[c.author.name] = (counts[c.author.name] || 0) + 1; (by[c.author.name] = by[c.author.name] || []).push(c.msg.split('\n')[0]); });
+    const names = Object.keys(counts);
+    if (a.some((x) => /^-[a-z]*n/.test(x))) names.sort((x, y) => counts[y] - counts[x] || x.localeCompare(y));
+    else names.sort();
+    names.forEach((n) => {
+      if (a.some((x) => /^-[a-z]*s/.test(x))) io.out(`${String(counts[n]).padStart(6)}\t${n}`);
+      else io.out(`${n} (${counts[n]}):\n${by[n].map((x) => '      ' + x).join('\n')}\n`);
+    });
+  };
+  SUB.clean = (m, repo, a, io) => {
+    const flags = a.filter((x) => x.startsWith('-')).join('');
+    const dry = flags.includes('n') || a.includes('--dry-run');
+    if (!dry && !flags.includes('f') && !a.includes('--force')) { io.err('fatal: clean.requireForce defaults to true and neither -i, -n, nor -f given; refusing to clean'); return 128; }
+    const s = status(m, repo);
+    const withDirs = flags.includes('d');
+    const targets = s.untracked.filter((p) => withDirs || !p.includes('/'));
+    const skipped = s.untracked.filter((p) => !withDirs && p.includes('/'));
+    if (flags.includes('x')) { /* ignored files would be included too */ }
+    for (const p of targets) { io.out(`${dry ? 'Would remove' : 'Removing'} ${p}`); if (!dry) m.files.delete(repo.root + '/' + p); }
+    if (skipped.length) io.out(`${dry ? 'Would skip' : 'Skipping'} repository ${[...new Set(skipped.map((p) => p.split('/')[0] + '/'))].join(', ')}`);
   };
   SUB.remote = (m, repo, a, io) => {
     const op = a[0] && !a[0].startsWith('-') ? a[0] : 'list';
@@ -989,6 +1170,14 @@
     if (!url) { io.err(`fatal: '${remoteName}' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.`); return 128; }
     const rem = findRemote(m, url);
     if (!rem) { io.err(`remote: Repository not found.\nfatal: repository '${url}/' not found`); return 128; }
+    if (a.includes('--tags') || (p[1] && repo.tags[p[1]] && !repo.branches[p[1]])) {
+      rem.tags = rem.tags || {};
+      const names = a.includes('--tags') ? Object.keys(repo.tags) : [p[1]];
+      const fresh = names.filter((t) => rem.tags[t] !== repo.tags[t]);
+      fresh.forEach((t) => { rem.tags[t] = repo.tags[t]; });
+      io.out(fresh.length ? `To ${url}\n${fresh.map((t) => ` * [new tag]         ${t} -> ${t}`).join('\n')}` : 'Everything up-to-date');
+      return 0;
+    }
     let branch = p[1] || (up && up.branch) || cur;
     if (branch === 'HEAD') branch = cur;
     if (del) {
@@ -1002,6 +1191,10 @@
     const localId = repo.branches[src];
     if (!localId) { io.err(`error: src refspec ${src} does not match any\nerror: failed to push some refs to '${url}'`); return 1; }
     const remoteId = rem.branches[dst];
+    if (rem.protect && rem.protect[dst] && remoteId !== localId) {
+      io.err(`remote: error: GH006: Protected branch update failed for refs/heads/${dst}.\nremote: error: Changes must be made through a pull request.\nTo ${url}\n ! [remote rejected] ${src} -> ${dst} (protected branch hook declined)\nerror: failed to push some refs to '${url}'`);
+      return 1;
+    }
     if (remoteId === localId) { io.out('Everything up-to-date'); }
     else {
       if (remoteId && !force && !isAncestor(m, remoteId, localId)) {
@@ -1017,5 +1210,5 @@
     return 0;
   };
 
-  LP.G = { status, treeOf, headId, resolveRef, ancestors, isAncestor, mergeBase, mergeTrees, findRemote, urlKey, newCommit, applyTree, setHead, identity, cloneInto, fetchRemote, mergeInto, doCommit, worktree, short, newRepo };
+  LP.G = { logHead, fmtDate, status, treeOf, headId, resolveRef, ancestors, isAncestor, mergeBase, mergeTrees, findRemote, urlKey, newCommit, applyTree, setHead, identity, cloneInto, fetchRemote, mergeInto, doCommit, worktree, short, newRepo };
 })(typeof window !== 'undefined' ? window : globalThis);
