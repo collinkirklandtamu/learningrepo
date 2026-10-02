@@ -6,8 +6,24 @@
   const SEP = '\u001f';
 
   const BOOT = `
+.lp_cleanup <- function() {
+  # Learner code runs in the global environment, like a normal R script (so S3 methods and S4 classes
+  # are visible to R's own code). Reset it before and after every run so nothing leaks between runs
+  # or lessons: S4/Reference classes first (they also register in a global table), then all objects.
+  g <- globalenv()
+  suppressMessages(suppressWarnings({
+    for (cl in tryCatch(getClasses(g), error = function(e) character(0))) try(removeClass(cl, where = g), silent = TRUE)
+    for (f in tryCatch(getGenerics(g)@.Data, error = function(e) character(0))) try(removeMethods(f, where = g), silent = TRUE)
+    all <- ls(g, all.names = TRUE)
+    rm(list = all[!grepl("^\\\\.lp_", all)], envir = g)
+  }))
+  invisible(NULL)
+}
 .lp_run <- function(code, harness) {
-  env <- new.env(parent = globalenv())
+  force(code); force(harness)   # arguments are lazy: read them before the cleanup wipes globals
+  .lp_cleanup()
+  on.exit(.lp_cleanup(), add = TRUE)
+  env <- globalenv()
   err <- ""
   try(setTimeLimit(elapsed = 8, transient = TRUE), silent = TRUE)
   out <- paste(utils::capture.output({
