@@ -182,12 +182,12 @@
         if (args[0] && files) {
           const src = files.get(args[0]);
           if (src === undefined) { res.out.push(`python: can't open file '${args[0]}': [Errno 2] No such file or directory`); res.exit = 2; return res; }
-          if (isWebApp(src)) { res.long = true; res.web = { body: (/return\s+["'](.*?)["']/.exec(src) || /["'](Hello[^"']*)["']/.exec(src) || [])[1] || `Hello from ${img.name}!` }; res.out.push('Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...'); return res; }
           const missing = [...src.matchAll(/os\.environ\[["'](\w+)["']\]/g)].map((x) => x[1]).filter((k) => env[k] === undefined);
           if (missing.length) {
             res.out.push('Traceback (most recent call last):', `  File "${(cwd === '/' ? '' : cwd) + '/' + args[0]}", line 1, in <module>`, `KeyError: '${missing[0]}'`);
             res.exit = 1; return res;
           }
+          if (isWebApp(src)) { res.long = true; res.web = { body: (/return\s+["'](.*?)["']/.exec(src) || /["'](Hello[^"']*)["']/.exec(src) || [])[1] || `Hello from ${img.name}!` }; res.out.push('Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...'); return res; }
           litPrints(src, env).forEach((l) => res.out.push(l));
           const ex = /(?:sys\.exit|raise SystemExit|^exit)\(\s*(\d+)\s*\)/m.exec(src);
           if (ex && +ex[1] !== 0) res.exit = +ex[1];
