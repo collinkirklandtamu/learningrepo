@@ -113,6 +113,8 @@
 
   // ---------- refs ----------
   function resolveRef(m, repo, name) {
+    const rl = /^(HEAD|@)@\{(\d+)\}$/.exec(name);
+    if (rl) { const e = repo.reflog[parseInt(rl[2], 10)]; return e ? e.id : null; }
     const mm = /^([^~^]+)((?:[~^]\d*)+)?$/.exec(name);
     if (!mm) return null;
     const base = mm[1];
@@ -324,6 +326,7 @@
       tree = Object.assign({}, tree);
       for (const [p, v] of Object.entries(c.files || {})) { if (v === null) delete tree[p]; else tree[p] = v; }
       prev = newCommit(this, c.msg, prev ? [prev] : [], tree, c.author || { name: 'Learner', email: 'learner@example.com' });
+      repo.reflog.unshift({ id: prev, note: `commit${repo.reflog.length ? '' : ' (initial)'}: ${c.msg.split('\n')[0]}` });
     }
     if (prev) repo.branches[repo.head.ref] = prev;
     applyTree(this, repo, tree, {});
