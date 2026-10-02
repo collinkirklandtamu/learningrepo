@@ -15,6 +15,19 @@
 </head>
 <body>
   <div id="app"></div>
+  <div id="boot-error" hidden style="max-width:640px;margin:48px auto;padding:20px;border:1px solid #c43838;border-radius:12px;font:15px/1.6 system-ui,sans-serif"></div>
+  <script>
+    // If the app fails to start, say why on screen instead of leaving a blank page.
+    (function () {
+      var box = function () { return document.getElementById('boot-error'); };
+      function show(msg) { var b = box(); if (!b) return; b.hidden = false; b.innerHTML = '<b>Forge could not start.</b><br>' + msg + '<br><br><small>Open the browser console (F12 or Cmd+Option+J) and look for red errors. Serve the folder that contains <code>index.html</code>, e.g. <code>python3 -m http.server 8000</code> from the repo root, then open <code>http://localhost:8000</code>.</small>'; }
+      window.addEventListener('error', function (e) {
+        if (e.target && e.target.src && /\/js\//.test(e.target.src)) show('A script failed to load: <code>' + e.target.src.replace(location.origin, '') + '</code>. Is the server running from the repo root?');
+        else if (e.message && !document.getElementById('main')) show('JavaScript error: <code>' + String(e.message).replace(/</g, '&lt;') + '</code>');
+      }, true);
+      window.addEventListener('load', function () { setTimeout(function () { if (!document.getElementById('main')) show('The app did not render. Make sure you are on the branch that contains the <code>js/</code> folder.'); }, 1500); });
+    })();
+  </script>
   <div id="toasts" aria-live="polite"></div>
   <noscript><p style="padding:2rem">Forge needs JavaScript to run lessons in your browser.</p></noscript>
 

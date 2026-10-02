@@ -116,7 +116,8 @@
         store.noteRun();
         return await engine.run(code, withChecks ? lesson.harness : '');
       } catch (e) {
-        outEl.innerHTML = `<span class="err-text">Could not load the ${esc(course.title)} runtime: ${esc(e.message)}\n\nThe in-browser ${esc(course.title)} engine is downloaded from a CDN the first time (about 10-30 MB), so it needs an internet connection once. Check your connection and try again.</span>`;
+        console.error('runtime load failed', e);
+        outEl.innerHTML = `<span class="err-text">Could not load the ${esc(course.title)} runtime: ${esc(e.message)}\n\nThis needs to reach ${course.engine === 'python' ? 'cdn.jsdelivr.net' : 'webr.r-wasm.org'}. Ad blockers, VPNs and school/work networks sometimes block it; try another network or disable the blocker for this page.\n\nThe in-browser ${esc(course.title)} engine is downloaded from a CDN the first time (about 10-30 MB), so it needs an internet connection once. Check your connection and try again.</span>`;
         setStatus('Runtime unavailable');
         return null;
       }
