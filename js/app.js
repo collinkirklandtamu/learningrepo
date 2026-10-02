@@ -32,6 +32,7 @@
       else if (name === 'course') { const c = LP.course(arg); document.title = (c ? c.title : 'Course') + ' · Forge'; LP.views.course(main, arg); }
       else if (name === 'lesson') { const f = LP.findLesson(arg); document.title = (f ? f.lesson.title : 'Lesson') + ' · Forge'; LP.views.lesson(main, arg); }
       else if (name === 'review') { document.title = 'Review · Forge'; LP.views.review(main); }
+      else if (name === 'reference') { document.title = 'Reference · Forge'; LP.views.reference(main, arg); }
       else if (name === 'profile') { document.title = 'Profile · Forge'; LP.views.profile(main); }
       else { location.hash = '#/'; return; }
     } catch (e) {
@@ -47,7 +48,7 @@
     LP.store = LP.createStore(safeStorage());
     try { const t = localStorage.getItem('forge.theme'); if (t && t !== 'auto') document.documentElement.dataset.theme = t; } catch (e) { /* ignore */ }
     document.getElementById('app').innerHTML = `<header class="topbar"><a class="brand" href="#/"><span class="logo">⚒</span><span class="name">Forge</span></a>
-      <nav class="nav" aria-label="Main"><a href="#/" data-nav="dashboard">Learn</a><a href="#/review" data-nav="review">Review<span class="badge-dot" id="due-badge" hidden>0</span></a><a href="#/profile" data-nav="profile">Profile</a></nav>
+      <nav class="nav" aria-label="Main"><a href="#/" data-nav="dashboard">Learn</a><a href="#/review" data-nav="review">Review<span class="badge-dot" id="due-badge" hidden>0</span></a><a href="#/reference" data-nav="reference">Reference</a><a href="#/profile" data-nav="profile">Profile</a></nav>
       <span class="spacer"></span><div class="chips" id="chips"></div></header><main id="main"></main>`;
     LP.store.subscribe(() => LP.refreshHeader());
     root.addEventListener('hashchange', route);

@@ -194,3 +194,28 @@ test('every lesson has the fields the UI relies on, and drills/capstones are wel
     }
   }
 });
+
+test('content-quality gate: plenty of practice in every course', () => {
+  for (const c of LP.courses) {
+    const mains = c.lessons.filter((l) => !l.drill && !l.capstone);
+    assert.ok(mains.length >= 14, `${c.id}: needs at least 14 main lessons (has ${mains.length})`);
+    assert.strictEqual(c.lessons.filter((l) => l.capstone).length, 1, `${c.id}: exactly one capstone`);
+    for (const l of mains) {
+      const drills = c.lessons.filter((x) => x.parent === l.id).length;
+      assert.ok(drills >= 2, `${l.id}: needs 2+ drills (has ${drills})`);
+      assert.ok((l.recall || []).length >= 4, `${l.id}: needs 4+ recall cards (has ${(l.recall || []).length})`);
+    }
+    const cap = c.lessons.find((l) => l.capstone);
+    assert.ok((cap.recall || []).length >= 4, `${c.id}: capstone recall`);
+    assert.ok(cap.xp >= 100, `${c.id}: capstone is worth real XP`);
+  }
+  const total = LP.courses.reduce((n, c) => n + c.lessons.length, 0);
+  assert.ok(total >= 400, 'the platform should have 400+ exercises (lessons + drills + capstones), has ' + total);
+});
+
+test('both OOP arcs exist and include inheritance lessons', () => {
+  const arcs = {};
+  for (const c of LP.courses) for (const l of c.lessons) if (l.arc) (arcs[l.arc] = arcs[l.arc] || []).push(l.id);
+  assert.ok(arcs['oop-python'].includes('py-inheritance'), 'python arc has inheritance');
+  assert.ok(arcs['oop-r'].includes('r-s3') && arcs['oop-r'].includes('r-s4') && arcs['oop-r'].includes('r-r5'), 'R arc covers S3, S4 and Reference classes');
+});
