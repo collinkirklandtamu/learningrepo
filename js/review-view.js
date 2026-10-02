@@ -47,7 +47,7 @@
           <div class="row" style="justify-content:space-between;margin-bottom:8px"><a href="#/review" class="muted" style="text-decoration:none">✕ Quit</a><span class="muted">Card ${st.i + 1} of ${items.length}</span></div>
           <div class="bar" style="margin-bottom:14px"><i style="width:${(st.i / items.length) * 100}%"></i></div>
           <div class="combo"><span title="Consecutive correct answers">🔥 ${st.combo}</span><div class="meter"><i style="width:${Math.min(st.combo, 8) / 8 * 100}%"></i></div><span class="x">${practice ? '+1 XP' : '+' + (3 + Math.min(st.combo, 8)) + ' XP'}</span></div>
-          <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="pill">${c.icon} ${esc(c.title)} · ${esc(it.f.lesson.skill)}</span>${card ? dots(card.box) : ''}</div><div id="qhost"></div><div id="after"></div></div></div>`;
+          <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="pill">${c.icon} ${esc(c.title)} · ${esc(it.f.lesson.skill)}</span>${card ? dots(card.box) : ''}</div><div id="qhost" data-card="${esc(it.id)}"></div><div id="after"></div></div></div>`;
         LP.renderQuestion(main.querySelector('#qhost'), it.q, (ok) => {
           const before = card ? card.box : 0;
           const r = store.answerCard(it.id, ok, st.combo, practice);

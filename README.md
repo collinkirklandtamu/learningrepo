@@ -2,7 +2,17 @@
 
 An interactive learning platform in the style of [boot.dev](https://boot.dev): short reading on the left, a real workspace on the right, instant feedback, XP and skill points, and spaced-repetition review so what you learn actually sticks.
 
-**Courses (41 lessons):** Python (10) · R (8) · Git (9) · GitHub (7) · Docker (7)
+**Courses: 119 lessons, 295 practice drills, 5 capstones, 550+ recall cards.**
+
+| Course | Lessons | Drills | Highlights |
+|---|---|---|---|
+| Python | 39 | 114 | strings, collections, closures, generators, decorators, files/JSON, stdlib, **classes → inheritance → polymorphism → composition → ABCs → properties → dataclasses**, typing, testing, algorithms, `asyncio`; capstone: text-adventure engine |
+| R (base R) | 31 | 89 | vectors to data frames, regex, dates, functional tools, environments, error handling, **S3 → S4 → Reference-class inheritance**, simulation, hypothesis tests, ANOVA, `glm`, `optim`, metaprogramming; capstone: survey-analysis pipeline with an S4 report |
+| Git | 17 | 32 | branches, merge & conflicts, **rebase, cherry-pick, reflog recovery, bisect**, tags, clean, stash; capstone: rescue a broken repo |
+| GitHub | 15 | 28 | remotes, PRs, **code review, branch protection, conflicting PRs**, forks, releases, Actions (matrix/cache/secrets), Dependabot, CODEOWNERS; capstone: ship a contribution |
+| Docker | 17 | 32 | containers, volumes & bind mounts, Dockerfiles, **`.dockerignore`, multi-stage builds, healthchecks, networking & DNS, registries, debugging crash loops, resource limits**, Compose (env files, profiles, healthy dependencies); capstone: a two-service stack |
+
+Plus a searchable **Reference** page (see below).
 
 It is a **static site with no build step**: HTML, CSS and plain JavaScript.
 
@@ -27,11 +37,21 @@ The first Python / R lesson downloads its runtime from a CDN once (Pyodide ≈ 1
 | **Hidden tests** | Python/R lessons run your code against hidden checks and tell you *what* is wrong. Terminal and file lessons show a **live checklist** that ticks as you work. |
 | **XP with a performance multiplier** | A perfect first try with no hints earns **+25%**. Each failed submit costs 15% and each hint 10% (floor 40%). Revealing the solution forfeits the lesson's XP. XP is only awarded on first completion, so grinding replays does nothing. |
 | **Skill points & mastery** | Every lesson trains a skill (Basics, Control flow, Branching, Compose…). 1-3 ★ × difficulty skill points are awarded, and skills climb Novice → Apprentice → Adept → Expert → Master. |
+| **Practice drills** | Every lesson is followed by 2-3 short **drills**: variations on what you just learned (different data, a new constraint, "now without a loop"). They earn smaller XP, count as practice, and the *Next* button walks you through them. Skip any you like. |
+| **Capstones** | Each course ends with a larger project that combines the whole course. |
 | **Lock it in** | Right after a lesson you answer one retrieval question for a bonus. Retrieval beats re-reading. |
 | **Spaced repetition** | Every lesson plants recall cards in a Leitner system (1, 2, 4, 8, 16, 32 day boxes). Right answers promote a card; wrong answers send it back to box 1. |
 | **Combos & crits** | Consecutive correct review answers raise the XP per card (up to +8) and each answer has a 10% chance of a critical hit (×2): a variable-reward schedule that makes reviews feel like a game. |
 | **Rusty skills** | If a skill's cards are long overdue it is flagged ⚠ on the dashboard until you review. |
-| **Streaks, daily goal, badges** | A daily XP goal ring, day streaks and 13 badges. |
+| **Streaks, daily goal, badges** | A daily XP goal ring, day streaks and 19 badges (including Practice, Capstone and Inheritance). |
+
+## Reference page
+
+`#/reference` is a searchable look-up for **258 Python** (every public builtin plus `str`/`list`/`dict`/`set`/`tuple` methods and the commonly used stdlib), **320 base-R** functions (base, stats, utils, methods), and **62 Git/`gh` and 47 Docker** commands and Dockerfile instructions, each with a runnable example, its real output and a link to the lesson that teaches it (✓ once you have finished it).
+
+Honest scope: "every function" is unbounded, so the promise is: **all of Python's builtins** (a test compares the page against `dir(builtins)`), a **curated set of the most-used base-R functions** (not all of base R), and **every command the sandbox supports** (things it cannot run are listed and marked *real tool only*). The Python and R examples are executed by the real interpreters in the test suite, and the recorded output must match; Git/Docker examples run in the sandbox.
+
+To add entries edit `tools/reference-src/python.js` or `r.js` (`[name, signature, description, example, lessonId]`), then run `node tools/build-reference.js` to record the outputs. Git/Docker entries live in `js/content/reference-cli.js`.
 
 ## What is real and what is simulated
 
@@ -57,6 +77,7 @@ Content lives in `js/content/<course>.js`. A new lesson is one object in a cours
 }
 ```
 
+- **Drills** are small lessons attached to a parent: `LP.addDrills({ 'py-sets': [{ title, task, starter, harness, hints, solution }] })`. They inherit skill, difficulty and kind, and get their own ids (`py-sets-d1`...). A **capstone** is a normal lesson with `capstone: true` and a larger `xp`. Lessons that teach inheritance carry `arc: 'oop-python' | 'oop-r'` (completing the arc earns a badge). Extra recall cards: `LP.addRecall({ 'py-sets': [...] })`. A course's final `*-order.js` file calls `LP.assemble(course, [ids...], skills)` to fix the order.
 - **R** lessons use `harness` written in R with `check(cond, "message")` and `.out` for stdout.
 - **Terminal** lessons add `kind: 'terminal'` (default for the Git/GitHub/Docker courses), a `setup(m)` that builds the starting sandbox, and `checks: [{ label, test: (m) => bool }]`. `solution` is a list of commands (or `{ write, content }` file edits). Handy sandbox helpers: `m.seedRepo`, `m.seedRemote`, `m.remoteCommit`, `m.hook(when, run, message)` for "a teammate just pushed" moments, `m.ran(/regex/)`, `m.gitLog()`, `m.container(name)`.
 - **File** lessons use `kind: 'file'`, `lang: 'yaml' | 'dockerfile'` and `checks: [{ label, test: (text, ctx) => bool }]`.
@@ -66,7 +87,8 @@ The test suite refuses a lesson whose starter already passes or whose reference 
 ## Tests
 
 ```bash
-npm test            # 72 tests: every lesson's solution vs. real python3/Rscript + the sandbox engines + the XP/SRS rules
+npm test            # ~470 tests: every lesson and drill's solution vs. real python3/Rscript, the sandbox engines, XP/SRS rules, the reference examples, and a content-quality gate (2+ drills and 4+ recall cards per lesson, a capstone per course)
+RUNTIME_ONLY=python node --test tests/runtime.test.js   # all Python solutions in REAL Pyodide (also: =r for WebR)
 npm install && npm run test:e2e   # Chromium end-to-end run using the REAL Pyodide and WebR from node_modules
 ```
 
@@ -80,7 +102,9 @@ css/style.css           design tokens, dark/light theme, layout
 js/store.js             XP, skills, spaced repetition, streaks, badges (pure logic)
 js/lessons.js           lesson lookup, check evaluation, solution playback
 js/engines/             python.js, r.js (WASM runtimes) · shell.js, git.js, gh.js, docker.js (sandbox)
-js/content/             the five courses
+js/content/             the five courses (<course>.js, <course>-N.js chunks, <course>-order.js) and reference-*.js
+js/reference-view.js    the searchable reference page
+tools/                  build-reference.js + reference-src/ (records example output with the real interpreters)
 js/views.js, lesson-view.js, review-view.js, app.js, ui-common.js, terminal.js, editor.js, md.js
 tests/                  node:test suites + tests/e2e (Playwright)
 ```

@@ -14,6 +14,8 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y r-base-core
       - run: npm ci
       - run: npm test
+      # every lesson solution against the real Pyodide / WebR runtimes
+      - run: node --test tests/runtime.test.js
 
   browser:
     runs-on: ubuntu-latest

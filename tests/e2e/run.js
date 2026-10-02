@@ -91,7 +91,7 @@ const ok = (cond, msg) => { if (cond) console.log('  ✓ ' + msg); else { failur
   ok((await xp(page)) === earned + 5, 'correct recall answer adds +5 XP bonus');
   await page.click('.after a.btn.primary');
   await page.waitForSelector('.lesson-title');
-  ok(/Variables/.test(await page.textContent('.lesson-title')), 'Next goes to the following lesson');
+  ok(/py-hello-d1/.test(page.url()), 'Next goes to the first practice drill of the lesson');
   ok((await page.evaluate(() => LP.store.dueCards().length)) === 0, 'planted cards are not due immediately');
 
   // runtime error surfaces nicely, infinite loop is stopped
@@ -232,15 +232,15 @@ const ok = (cond, msg) => { if (cond) console.log('  ✓ ' + msg); else { failur
     if (!f) break;
     // answer correctly by reading the lesson data for the card currently on screen
     const done = await page.evaluate(() => new Promise((res) => {
-      const text = document.querySelector('#qhost .q').textContent.trim();
-      let hit = null;
-      for (const c of LP.courses) for (const l of c.lessons) for (const q of l.recall) if (q.q.replace(/[`~]/g, '').replace(/\s+/g, ' ').trim().startsWith(text.replace(/\s+/g, ' ').slice(0, 20))) hit = q;
-      if (!hit) return res('nomatch');
+      const [lid, idx] = document.querySelector('#qhost').dataset.card.split('#');
+      const hit = LP.findLesson(lid).lesson.recall[+idx];
+      const text = '', domOpts = [];
+      if (!hit) return res('nomatch: ' + text.slice(0, 80) + ' OPTS=' + JSON.stringify(domOpts));
       if (hit.type === 'choice') document.querySelectorAll('#qhost .opt')[hit.answer].click();
       else { const inp = document.querySelector('#qhost input'); inp.value = hit.accept[0]; inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' })); }
       res('ok');
     }));
-    if (done !== 'ok') { ok(false, 'could not find the card in lesson data'); break; }
+    if (done !== 'ok') { ok(false, 'could not find the card in lesson data: ' + done); break; }
     await page.waitForSelector('#nx');
     answered++;
     await page.click('#nx');
@@ -255,7 +255,9 @@ const ok = (cond, msg) => { if (cond) console.log('  ✓ ' + msg); else { failur
   step('Course page, profile, persistence');
   await page.goto(base + '#/course/python');
   await page.waitForSelector('.node');
-  ok((await page.$$('.node')).length === 10, 'python course lists 10 lessons');
+  const pyMains = LP.courses.find((c) => c.id === 'python').lessons.filter((l) => !l.drill).length;
+  ok((await page.$$('.node')).length === pyMains && pyMains >= 30, `python course lists ${pyMains} main lessons`);
+  ok((await page.$$('.dchip')).length >= 2, 'practice drills are shown under their lessons');
   ok((await page.$$('.node.done')).length >= 1, 'completed lessons are marked');
   await page.screenshot({ path: path.join(SHOTS, '06-course.png') });
   await page.goto(base + '#/profile');
@@ -265,6 +267,46 @@ const ok = (cond, msg) => { if (cond) console.log('  ✓ ' + msg); else { failur
   await page.reload();
   await page.waitForSelector('.badges');
   ok((await xp(page)) > 0, 'progress persists across reload (localStorage)');
+  ok(errors.length === 0, 'no page or console errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
+
+  // ------------------------------------------------------------------ drills, inheritance, reference
+  step('Practice drills, real-runtime inheritance lessons and the reference page');
+  const solve = async (pg, id) => {
+    if (await pg.$('.overlay')) { await pg.keyboard.press('Escape'); await pg.waitForSelector('.overlay', { state: 'detached', timeout: 5000 }).catch(() => pg.evaluate(() => document.querySelectorAll('.overlay').forEach((o) => o.remove()))); }
+    await pg.goto(base + '#/lesson/' + id);
+    await pg.waitForSelector('.CodeMirror', { timeout: 30000 });
+    const sol = await pg.evaluate((lid) => LP.findLesson(lid).lesson.solution, id);
+    await setCode(pg, sol);
+    await pg.click('#submit');
+    await pg.waitForSelector('.modal .bigstars', { timeout: 180000 });
+  };
+  const xpBefore = await xp(page);
+  await solve(page, 'py-hello-d1');
+  ok((await xp(page)) > xpBefore, 'completing a drill awards XP');
+  ok(await page.evaluate(() => LP.store.isDone('py-hello-d1')), 'the drill is marked done');
+  await solve(page, 'py-inheritance');
+  ok(await page.evaluate(() => LP.store.isDone('py-inheritance')), 'Python inheritance lesson passes in real Pyodide');
+  await solve(page, 'r-s4');
+  ok(await page.evaluate(() => LP.store.isDone('r-s4')), 'R S4 inheritance lesson passes in real WebR');
+  await page.keyboard.press('Escape');
+  await page.goto(base + '#/course/python');
+  await page.waitForSelector('.dchip.done');
+  ok((await page.$$('.dchip.done')).length >= 1, 'finished drills are ticked on the course page');
+  await page.evaluate(() => document.querySelectorAll('.overlay').forEach((o) => o.remove()));
+  await page.goto(base + '#/reference');
+  await page.waitForSelector('.ref-item');
+  ok((await page.$$('.ref-tabs a')).length === 4, 'reference has four tabs');
+  await page.fill('#ref-q', 'sorted');
+  ok(/sorted/.test(await page.textContent('.ref-item:first-child .ref-name')), 'searching "sorted" ranks the sorted() entry first');
+  await page.click('.ref-item:first-child summary');
+  ok(/\[/.test(await page.textContent('.ref-item:first-child .ref-out')), 'an entry expands to show a runnable example with its output');
+  await page.click('.ref-tabs a:nth-child(2)');
+  await page.waitForSelector('.ref-item');
+  await page.fill('#ref-q', 'merge');
+  ok(/merge/.test(await page.textContent('.ref-item:first-child .ref-name')), 'the R tab finds merge()');
+  await page.fill('#ref-q', 'zzzzzz');
+  ok(/Nothing matches/.test(await page.textContent('#ref-list')), 'no results shows a friendly message');
+  await page.screenshot({ path: path.join(SHOTS, '09-reference.png') });
   ok(errors.length === 0, 'no page or console errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
 
   // ------------------------------------------------------------------ fallback editor (CDN blocked) + mobile
