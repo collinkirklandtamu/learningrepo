@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Forge: learn by doing</title>
+  <meta name="description" content="Interactive, reinforcement-based lessons for Python, R, Git, GitHub and Docker. Read a little, build immediately, earn XP and skill points.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%92%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try { var t = localStorage.getItem('forge.theme'); if (t && t !== 'auto') document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toasts" aria-live="polite"></div>
+  <noscript><p style="padding:2rem">Forge needs JavaScript to run lessons in your browser.</p></noscript>
+
+  <!-- Optional syntax highlighting. The editor falls back to a plain textarea if these fail to load. -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/r/r.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/yaml/yaml.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/simple.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dockerfile/dockerfile.min.js"></script>
+
+  <!-- Engines -->
+  <script defer src="js/engines/shell.js"></script>
+  <script defer src="js/engines/git.js"></script>
+  <script defer src="js/engines/gh.js"></script>
+  <script defer src="js/engines/docker.js"></script>
+  <script defer src="js/engines/python.js"></script>
+  <script defer src="js/engines/r.js"></script>
+  <!-- Content: add a lesson file here to add a course -->
+  <script defer src="js/content/python.js"></script>
+  <script defer src="js/content/r.js"></script>
+  <script defer src="js/content/git.js"></script>
+  <script defer src="js/content/github.js"></script>
+  <script defer src="js/content/docker.js"></script>
+  <!-- App -->
+  <script defer src="js/store.js"></script>
+  <script defer src="js/lessons.js"></script>
+  <script defer src="js/md.js"></script>
+  <script defer src="js/ui-common.js"></script>
+  <script defer src="js/editor.js"></script>
+  <script defer src="js/terminal.js"></script>
+  <script defer src="js/views.js"></script>
+  <script defer src="js/lesson-view.js"></script>
+  <script defer src="js/review-view.js"></script>
+  <script defer src="js/app.js"></script>
+</body>
+</html>

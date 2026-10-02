@@ -1,0 +1,17 @@
+{
+  "name": "forge-learning-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive, reinforcement-based learning platform for Python, R, Git, GitHub and Docker. Static site, no build step.",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "node tests/e2e/run.js"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.49.0",
+    "pyodide": "^0.26.4",
+    "webr": "^0.4.4",
+    "codemirror": "^5.65.16"
+  }
+}
